@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script {
                     sh 'pwd'
-                    sh 'pm2 start hello.js'
+                    sh 'pm2 restart hello.js'
                 }
             }
         }
