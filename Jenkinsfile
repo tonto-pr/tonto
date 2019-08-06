@@ -5,6 +5,9 @@ pipeline {
     }
     stages {
         stage('Build') {
+            environment {
+                BUILD_ID=123
+            }
             steps {
                 script {
                     sh 'pwd'
@@ -13,6 +16,9 @@ pipeline {
             }
         }
         stage('Test') {
+            environment {
+                BUILD_ID=123
+            }
             steps {
                 script {
                     sh 'pm2 list'
@@ -20,8 +26,13 @@ pipeline {
             }
         }
         stage('Deploy') {
+            environment {
+                BUILD_ID=123
+            }
             steps {
-                echo 'Deploying....'
+                script {
+                    echo 'Deploying'
+                }
             }
         }
     }
