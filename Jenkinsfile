@@ -1,6 +1,8 @@
 pipeline {
     agent any
-
+    environment {
+        BUILD_ID=123
+    }
     stages {
         stage('Build') {
             steps {
