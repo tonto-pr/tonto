@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script {
                     sh 'pwd'
-                    sh 'ls -la && cd .. && ls -la'
+                    sh 'node hello.js'
                 }
             }
         }
