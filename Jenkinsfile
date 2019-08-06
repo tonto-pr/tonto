@@ -14,7 +14,9 @@ pipeline {
         }
         stage('Test') {
             steps {
-                echo 'Testing..'
+                script {
+                    sh 'pm2 list'
+                }
             }
         }
         stage('Deploy') {
