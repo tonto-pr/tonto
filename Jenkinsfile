@@ -5,20 +5,14 @@ pipeline {
     }
     stages {
         stage('Build') {
-            environment {
-                BUILD_ID=123
-            }
             steps {
                 script {
                     sh 'pwd'
-                    sh 'pm2 start hello.js'
+                    sh 'BUILD_ID=123 pm2 start hello.js'
                 }
             }
         }
         stage('Test') {
-            environment {
-                BUILD_ID=123
-            }
             steps {
                 script {
                     sh 'pm2 list'
@@ -26,9 +20,6 @@ pipeline {
             }
         }
         stage('Deploy') {
-            environment {
-                BUILD_ID=123
-            }
             steps {
                 script {
                     echo 'Deploying'
