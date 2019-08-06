@@ -19,10 +19,10 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
+        stage('Build user checker') {
             steps {
-                script {
-                    echo 'Deploying'
+                wrap([$class: 'BuildUser']) {
+                sh 'echo "${BUILD_USER}"'
                 }
             }
         }
