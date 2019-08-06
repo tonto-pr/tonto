@@ -4,9 +4,11 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-		 script {
-                      sh 'ls -la'
-		 }
+                script {
+                    sh 'ls -la'
+                    sh 'cd ..'
+                    sh 'ls -la'
+                }
             }
         }
         stage('Test') {
