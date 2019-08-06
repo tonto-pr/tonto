@@ -5,9 +5,8 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sh 'ls -la'
-                    sh 'cd ..'
-                    sh 'ls -la'
+                    sh 'pwd'
+                    sh 'ls -la && cd .. && ls -la'
                 }
             }
         }
