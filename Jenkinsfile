@@ -6,7 +6,7 @@ pipeline {
             steps {
                 script {
                     sh 'pwd'
-                    sh 'node hello.js'
+                    sh 'pm2 start hello.js'
                 }
             }
         }
