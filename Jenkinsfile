@@ -1,14 +1,11 @@
 pipeline {
     agent any
-    environment {
-        BUILD_ID=123
-    }
     stages {
         stage('Build') {
             steps {
                 script {
                     sh 'pwd'
-                    sh 'BUILD_ID=dontKillMe pm2 start hello.js'
+                    sh 'pm2 restart hello.js'
                 }
             }
         }
