@@ -9,6 +9,7 @@ pipeline {
                 script {
                     sh 'pwd'
                     sh 'BUILD_ID=123 pm2 start hello.js'
+                    sh 'pm2 save'
                 }
             }
         }
