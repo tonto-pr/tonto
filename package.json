@@ -1,0 +1,17 @@
+{
+  "name": "tonto",
+  "version": "1.0.0",
+  "description": "Initial package",
+  "main": "index.js",
+  "repository": "git@github.com:tonto-pr/tonto.git",
+  "author": "Anton Rautio <anton.rautio@smartly.io>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "~4.17.1",
+    "body-parser": "~1.19.0",
+    "cookie-parser": "~1.4.4"
+  },
+  "devDependencies": {
+    "pino": "~5.13.2"
+  }
+}
