@@ -1,0 +1,107 @@
+openapi: "3.2"
+info:
+  title: "Leivalle API"
+  description: "Use this API"
+  version: "0.1"
+  contact:
+    name: "Leivalle API"
+    url: "https://www.leivalle.org"
+    email: "anton.rautio@gmail.com"
+servers:
+  - url: "https://api.leivalle.org"
+    description: "Production API"
+paths:
+  /create:
+    post:
+      tags:
+      - New entity
+      summary: "Create new entities."
+      description: "Create new entities to the database."
+      operationId: CreateEntities
+      parameters:
+      responses:
+      deprecated:
+      security:
+      servers:
+      requestBody:
+      callbacks:
+  /read:
+    get:
+      tags:
+      - Read Entity
+      summary: "Read entities."
+      description: "Read entities from the database."
+      operationId: ReadEntities
+      parameters:
+      - name: q
+        in: query
+        description: "**Entity name** *Example: Strange entity*"
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json
+              schema:
+                title: Entity found
+                type: object
+                properties:
+                  placeholder:
+                    type: string
+                    description: Placeholder description
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Entity not found
+                type: string
+                example: Not found
+  /update:
+    put:
+      tags:
+      - Update entities
+      summary: "Update entities."
+      description: "Update entities in the database."
+      operationId: UpdateEntities
+      parameters:
+      - name: id
+        in: query
+        description: "**Entity id** *Example: 1*"
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json
+              schema:
+                title: Entity updated
+                type: object
+                properties:
+                  placeholder:
+                    type: string
+                    description: Placeholder description
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Entity not found
+                type: string
+                example: Not found
+  /delete:
+    delete:
+      tags:
+      - Delete entities
+      summary: "Delete entities."
+      description: "Delete entities from the database."
+      operationId: DeleteEntities
+      parameters:
+      - name: id
+        in: 
+      responses:
+      deprecated:
+      security:
+      servers:
+      requestBody:
+      callbacks:
