@@ -6,6 +6,9 @@
   "repository": "git@github.com:tonto-pr/tonto.git",
   "author": "Anton Rautio <anton.rautio@smartly.io>",
   "license": "MIT",
+  "scripts": {
+    "start": "node src/server/index.js"
+  },
   "dependencies": {
     "express": "~4.17.1",
     "body-parser": "~1.19.0",
