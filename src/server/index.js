@@ -17,6 +17,10 @@ app.get('/read', function(req, res, next) {
     res.json({'crud': 'READ'});
 })
 
+app.get('/about', function(req, res, next) {
+    res.end("Moi");
+})
+
 app.post('/create', function(req, res, next) {
     res.json({'crud': 'CREATE'});
 })
