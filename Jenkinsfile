@@ -4,8 +4,9 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    sh 'pwd'
-                    sh 'pm2 restart hello.js'
+                    sh 'yarn install'
+                    sh 'pm2 stop index'
+                    sh 'pm2 start src/server/index.js'
                 }
             }
         }
