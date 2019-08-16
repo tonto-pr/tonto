@@ -29,7 +29,7 @@ app.post('/entity/create', function(req, res, next) {
     res.json({'id': '123'});
 })
 
-app.post('/entity/:id', function(req, res, next) {
+app.put('/entity/:id', function(req, res, next) {
     res.json({'entity': req.params.id, name: "tester"});
 })
 

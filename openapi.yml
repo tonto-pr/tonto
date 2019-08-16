@@ -80,7 +80,6 @@ paths:
                 title: Entity not found
                 type: string
                 example: Not found
-  /entity/{entityId}:
     put:
       tags:
       - Update entities
@@ -102,6 +101,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Entity'
+            example:
+              id: 123
+              name: Anton
       responses:
         200:
           description: Successful response
@@ -122,7 +124,6 @@ paths:
                 title: Entity not found
                 type: string
                 example: Not found
-  /entity/{entityId}:
     delete:
       tags:
       - Delete entities
