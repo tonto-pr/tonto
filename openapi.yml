@@ -160,6 +160,9 @@ paths:
 components:
   schemas:
     Entity:
+      required:
+        - id
+        - name
       type: object
       properties:
         id:
