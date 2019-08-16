@@ -1,4 +1,4 @@
-openapi: "3.2"
+openapi: "3.0.0"
 info:
   title: "Leivalle API"
   description: "Use this API"
@@ -11,21 +11,41 @@ servers:
   - url: "https://api.leivalle.org"
     description: "Production API"
 paths:
-  /create:
+  /entity/create:
     post:
       tags:
       - New entity
       summary: "Create new entities."
       description: "Create new entities to the database."
       operationId: CreateEntities
-      parameters:
-      responses:
-      deprecated:
-      security:
-      servers:
       requestBody:
-      callbacks:
-  /read:
+        description: Entity body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Entity'
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: Entity created
+                type: object
+                properties:
+                  placeholder:
+                    type: string
+                    description: Placeholder description
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Entity not found
+                type: string
+                example: Not found
+  /entity/{entityId}:
     get:
       tags:
       - Read Entity
@@ -33,16 +53,18 @@ paths:
       description: "Read entities from the database."
       operationId: ReadEntities
       parameters:
-      - name: q
-        in: query
-        description: "**Entity name** *Example: Strange entity*"
+      - name: entityId
+        in: path
+        description: "**Entity id** *Example: 1*"
+        required: true
         schema:
-          type: string
+          type: integer
+          minimum: 1
       responses:
         200:
           description: Successful response
           content:
-            application/json
+            application/json:
               schema:
                 title: Entity found
                 type: object
@@ -58,7 +80,7 @@ paths:
                 title: Entity not found
                 type: string
                 example: Not found
-  /update:
+  /entity/{entityId}:
     put:
       tags:
       - Update entities
@@ -66,14 +88,25 @@ paths:
       description: "Update entities in the database."
       operationId: UpdateEntities
       parameters:
-      - name: id
-        in: query
+      - name: entityId
+        in: path
         description: "**Entity id** *Example: 1*"
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+      requestBody:
+        description: Entity body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Entity'
       responses:
         200:
           description: Successful response
           content:
-            application/json
+            application/json:
               schema:
                 title: Entity updated
                 type: object
@@ -89,7 +122,7 @@ paths:
                 title: Entity not found
                 type: string
                 example: Not found
-  /delete:
+  /entity/{entityId}:
     delete:
       tags:
       - Delete entities
@@ -97,11 +130,39 @@ paths:
       description: "Delete entities from the database."
       operationId: DeleteEntities
       parameters:
-      - name: id
-        in: 
+      - name: entityId
+        in: path
+        description: "**Entity id** *Example: 1*"
+        required: true
+        schema:
+          type: integer
+          minimum: 1
       responses:
-      deprecated:
-      security:
-      servers:
-      requestBody:
-      callbacks:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: Entity deleted
+                type: object
+                properties:
+                  placeholder:
+                    type: string
+                    description: Placeholder description
+        404:
+          description: Not found response
+          content:
+            text/plain:
+              schema:
+                title: Entity not found
+                type: string
+                example: Not found
+components:
+  schemas:
+    Entity:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string

@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var path = require('path');
 var http = require('http');
+var OpenApiValidator = require('express-openapi-validator').OpenApiValidator;
 
 var app = express();
 var port = 3000;
@@ -13,25 +14,26 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
-app.set('view engine', 'html');
+const spec = path.join(__dirname, 'openapi.yml');
+app.use('/spec', express.static(spec));
 
-app.get('/read', function(req, res, next) {
-    res.sendFile(__dirname + '/index.html');
+new OpenApiValidator({
+    apiSpecPath: './openapi.yml'
+}).install(app);
+
+app.get('/entity/:id', function(req, res, next) {
+    res.json({'id': req.params.id});
 })
 
-app.get('/about', function(req, res, next) {
-    res.download('test_feed_oyoy.csv.gz');
+app.post('/entity/create', function(req, res, next) {
+    res.json({'id': '123'});
 })
 
-app.post('/create', function(req, res, next) {
-    res.json({'crud': 'CREATE'});
+app.post('/entity/:id', function(req, res, next) {
+    res.json({'entity': req.params.id, name: "tester"});
 })
 
-app.post('/update', function(req, res, next) {
-    res.json({'crud': 'UPDATE'});
-})
-
-app.delete('/delete', function(req, res, next) {
+app.delete('/entity/:id', function(req, res, next) {
     res.json({'crud': 'DELETE'});
 })
 
