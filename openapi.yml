@@ -38,13 +38,7 @@ paths:
                     type: string
                     description: Placeholder description
         404:
-          description: Not found response
-          content:
-            text/plain:
-              schema:
-                title: Entity not found
-                type: string
-                example: Not found
+          $ref: '#/components/responses/NotFound'
   /entity/{entityId}:
     get:
       tags:
@@ -72,14 +66,8 @@ paths:
                   placeholder:
                     type: string
                     description: Placeholder description
-        404:
-          description: Not found response
-          content:
-            text/plain:
-              schema:
-                title: Entity not found
-                type: string
-                example: Not found
+        404: 
+          $ref: '#/components/responses/NotFound'
     put:
       tags:
       - Update entities
@@ -117,13 +105,7 @@ paths:
                     type: string
                     description: Placeholder description
         404:
-          description: Not found response
-          content:
-            text/plain:
-              schema:
-                title: Entity not found
-                type: string
-                example: Not found
+          $ref: '#/components/responses/NotFound'
     delete:
       tags:
       - Delete entities
@@ -151,22 +133,33 @@ paths:
                     type: string
                     description: Placeholder description
         404:
-          description: Not found response
-          content:
-            text/plain:
-              schema:
-                title: Entity not found
-                type: string
-                example: Not found
+          $ref: '#/components/responses/NotFound'
 components:
   schemas:
     Entity:
-      required:
-        - id
-        - name
       type: object
       properties:
         id:
           type: integer
         name:
           type: string
+      required:
+        - id
+        - name
+    Error:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
+      required:
+        - status
+        - message
+  responses:
+    NotFound:
+      description: The specified entity was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
