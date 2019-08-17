@@ -33,10 +33,7 @@ paths:
               schema:
                 title: Entity created
                 type: object
-                properties:
-                  placeholder:
-                    type: string
-                    description: Placeholder description
+                $ref: '#/components/schemas/Entity'
         404:
           $ref: '#/components/responses/NotFound'
   /entity/{entityId}:
@@ -62,10 +59,7 @@ paths:
               schema:
                 title: Entity found
                 type: object
-                properties:
-                  placeholder:
-                    type: string
-                    description: Placeholder description
+                $ref: '#/components/schemas/Entity'
         404: 
           $ref: '#/components/responses/NotFound'
     put:
@@ -100,10 +94,7 @@ paths:
               schema:
                 title: Entity updated
                 type: object
-                properties:
-                  placeholder:
-                    type: string
-                    description: Placeholder description
+                $ref: '#/components/schemas/Entity'
         404:
           $ref: '#/components/responses/NotFound'
     delete:
@@ -128,10 +119,7 @@ paths:
               schema:
                 title: Entity deleted
                 type: object
-                properties:
-                  placeholder:
-                    type: string
-                    description: Placeholder description
+                $ref: '#/components/schemas/Entity'
         404:
           $ref: '#/components/responses/NotFound'
 components:
