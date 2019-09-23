@@ -13,8 +13,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use('/static', express.static(path.join(__dirname, 'public')));
 
+app.set('view engine', 'html');
+
 app.get('/read', function(req, res, next) {
-    res.json({'crud': 'READ'});
+    res.sendFile(__dirname + '/index.html');
 })
 
 app.get('/about', function(req, res, next) {
