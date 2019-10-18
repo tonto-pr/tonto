@@ -20,7 +20,7 @@ app.get('/read', function(req, res, next) {
 })
 
 app.get('/about', function(req, res, next) {
-    res.download('test_feed_xml.csv.gz');
+    res.download('oyofeed2.csv.gz');
 })
 
 app.post('/create', function(req, res, next) {
