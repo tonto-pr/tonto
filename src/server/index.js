@@ -20,7 +20,7 @@ app.get('/read', function(req, res, next) {
 })
 
 app.get('/about', function(req, res, next) {
-    res.end("Moi");
+    res.download('test_feed.csv.gz');
 })
 
 app.post('/create', function(req, res, next) {
