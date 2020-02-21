@@ -5,8 +5,9 @@ pipeline {
             steps {
                 script {
                     sh 'yarn install'
+                    sh 'yarn generate'
                     sh 'pm2 stop index'
-                    sh 'pm2 start src/server/index.js'
+                    sh 'pm2 start yarn --interpreter bash --name api -- start-server'
                 }
             }
         }

@@ -1,0 +1,153 @@
+openapi: "3.0.0"
+info:
+  title: "Leivalle API"
+  description: "Use this API"
+  version: "0.1"
+  contact:
+    name: "Leivalle API"
+    url: "https://www.leivalle.org"
+    email: "anton.rautio@gmail.com"
+servers:
+  - url: "http://api.leivalle.org"
+    description: "Production API"
+paths:
+  /entity:
+    post:
+      tags:
+      - New entity
+      summary: "Create new entities."
+      description: "Create new entities to the database."
+      operationId: CreateEntities
+      requestBody:
+        description: Entity body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Entity'
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: Entity created
+                type: object
+                $ref: '#/components/schemas/Entity'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /entity/{entityId}:
+    get:
+      tags:
+      - Read Entity
+      summary: "Read entities."
+      description: "Read entities from the database."
+      operationId: ReadEntities
+      parameters:
+      - name: entityId
+        in: path
+        description: "**Entity id** *Example: 1*"
+        required: true
+        schema:
+          type: string
+          minimum: 1
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: Entity found
+                type: object
+                $ref: '#/components/schemas/Entity'
+        404: 
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+      - Update entities
+      summary: "Update entities."
+      description: "Update entities in the database."
+      operationId: UpdateEntities
+      parameters:
+      - name: entityId
+        in: path
+        description: "**Entity id** *Example: 1*"
+        required: true
+        schema:
+          type: string
+          minimum: 1
+      requestBody:
+        description: Entity body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Entity'
+            example:
+              id: 123
+              name: Anton
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: Entity updated
+                type: object
+                $ref: '#/components/schemas/Entity'
+        404:
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - Delete entities
+      summary: "Delete entities."
+      description: "Delete entities from the database."
+      operationId: DeleteEntities
+      parameters:
+      - name: entityId
+        in: path
+        description: "**Entity id** *Example: 1*"
+        required: true
+        schema:
+          type: string
+          minimum: 1
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: Entity deleted
+                type: object
+                $ref: '#/components/schemas/Entity'
+        404:
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    Entity:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+        - id
+        - name
+    Error:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
+      required:
+        - status
+        - message
+  responses:
+    NotFound:
+      description: The specified entity was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
