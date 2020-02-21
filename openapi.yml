@@ -8,10 +8,10 @@ info:
     url: "https://www.leivalle.org"
     email: "anton.rautio@gmail.com"
 servers:
-  - url: "https://api.leivalle.org"
+  - url: "http://api.leivalle.org"
     description: "Production API"
 paths:
-  /entity/create:
+  /entity:
     post:
       tags:
       - New entity
@@ -49,7 +49,7 @@ paths:
         description: "**Entity id** *Example: 1*"
         required: true
         schema:
-          type: integer
+          type: string
           minimum: 1
       responses:
         200:
@@ -74,7 +74,7 @@ paths:
         description: "**Entity id** *Example: 1*"
         required: true
         schema:
-          type: integer
+          type: string
           minimum: 1
       requestBody:
         description: Entity body
@@ -109,7 +109,7 @@ paths:
         description: "**Entity id** *Example: 1*"
         required: true
         schema:
-          type: integer
+          type: string
           minimum: 1
       responses:
         200:
@@ -128,7 +128,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         name:
           type: string
       required:
