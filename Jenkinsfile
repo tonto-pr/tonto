@@ -18,7 +18,7 @@ pipeline {
         stage('Launch server') {
             steps {
                 script {
-                    sh 'pm2 stop api'
+                    sh 'pm2 del api'
                     sh 'pm2 start yarn --interpreter bash --name api -- start-server'
                 }
             }
