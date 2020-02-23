@@ -5,6 +5,10 @@ import * as koaAdapter from '@smartlyio/oats-koa-adapter';
 import * as Koa from 'koa';
 import * as koaBody from 'koa-body';
 
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb://localhost:27017/tonto', {useNewUrlParser: true, useUnifiedTopology: true});
+
 // setup a db :)
 const values: { [key: string]: types.Entity } = {};
 

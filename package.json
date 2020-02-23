@@ -24,6 +24,8 @@
     "koa": "^2.11.0",
     "koa-body": "^4.1.1",
     "koa-router": "^7.2.1",
+    "mongoose": "^5.9.2",
+    "swagger-mongoose": "^1.1.2",
     "ts-node": "^8.6.2",
     "typescript": "^3.8.2"
   }
