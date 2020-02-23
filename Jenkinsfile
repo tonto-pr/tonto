@@ -1,27 +1,25 @@
 pipeline {
     agent any
     stages {
-        stage('Build') {
+        stage('Install packages') {
             steps {
                 script {
                     sh 'yarn install'
-                    sh 'yarn generate'
-                    sh 'pm2 stop index'
-                    sh 'pm2 start yarn --interpreter bash --name api -- start-server'
                 }
             }
         }
-        stage('Test') {
+        stage('Generate necessary OpenAPI files') {
             steps {
                 script {
-                    sh 'pm2 list'
+                    sh 'yarn generate'
                 }
             }
         }
-        stage('Build user checker') {
+        stage('Launch server') {
             steps {
-                wrap([$class: 'BuildUser']) {
-                sh 'echo "${BUILD_USER}"'
+                script {
+                    sh 'pm2 stop index'
+                    sh 'pm2 start yarn --interpreter bash --name api -- start-server'
                 }
             }
         }
