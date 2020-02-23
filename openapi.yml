@@ -122,6 +122,18 @@ paths:
                 $ref: '#/components/schemas/Entity'
         404:
           $ref: '#/components/responses/NotFound'
+  /test:
+    get:
+      tags:
+      - For testing purposes
+      summary: "For testing purposes"
+      operationId: TestOne
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                type: string
 components:
   schemas:
     Entity:

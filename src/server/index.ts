@@ -44,6 +44,11 @@ const spec: api.Endpoints = {
       }
       return runtime.json(404, { message: 'not found', status: 404 });
     }
+  },
+  '/test': {
+    get: async ctx => {
+      return runtime.text(200, 'Test! :)');
+    }
   }
 };
 
