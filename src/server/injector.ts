@@ -4,7 +4,6 @@ import safe from '@smartlyio/safe-navigation';
 import * as oas from 'openapi3-ts';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
-import * as _ from 'lodash';
 
 const openApiFilePath = './openapi.yml';
 
