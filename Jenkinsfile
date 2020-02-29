@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script {
                     sh 'pm2 delete all'
-                    sh 'pm2 start yarn --interpreter bash --name api -- start-server'
+                    sh 'pm2 start yarn --interpreter bash --name api -- start'
                 }
             }
         }
