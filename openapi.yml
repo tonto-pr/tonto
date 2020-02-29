@@ -136,6 +136,13 @@ paths:
                 type: string
 components:
   schemas:
+    EntityShell:
+      type: object
+      properties:
+        shellId:
+          type: string
+        childEntity:
+          $ref: '#/components/schemas/Entity'
     Entity:
       type: object
       properties:

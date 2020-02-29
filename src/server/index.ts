@@ -4,10 +4,19 @@ import * as runtime from '@smartlyio/oats-runtime';
 import * as koaAdapter from '@smartlyio/oats-koa-adapter';
 import * as Koa from 'koa';
 import * as koaBody from 'koa-body';
+import * as mongoose from 'mongoose';
+import { getModelForClass } from '@typegoose/typegoose';
+import injectTypegooseDecorators from './injector';
 
-const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/tonto', {useNewUrlParser: true, useUnifiedTopology: true, dbName: 'tonto'})
+  .then((m) => console.log('Successfully connected to mongodb'))
+  .catch((err) => console.error(err));
 
-mongoose.connect('mongodb://localhost:27017/tonto', {useNewUrlParser: true, useUnifiedTopology: true});
+injectTypegooseDecorators();
+
+const EntityModel = getModelForClass(types.Entity);
+const EntityShellModel = getModelForClass(types.EntityShell);
+const ErrorModel = getModelForClass(types.Error);
 
 // setup a db :)
 const values: { [key: string]: types.Entity } = {};
@@ -51,7 +60,18 @@ const spec: api.Endpoints = {
   },
   '/test': {
     get: async ctx => {
-      return runtime.text(200, 'Test! :)');
+      const { _id: id } = await EntityModel.create({id: '12', name: 'hello'} as types.ShapeOfEntity); // an "as" assertion, to have types for all properties
+      const entity = await EntityModel.findById(id).exec();
+
+      const { _id: status } = await ErrorModel.create({status: 400, message: 'hello'} as types.ShapeOfError); // an "as" assertion, to have types for all properties
+      const error = await ErrorModel.findById(status).exec();
+      console.log(error)
+
+      const { _id: shellId } = await EntityShellModel.create({shellId: '3300', childEntity: {id: '11', name: 'child'}} as types.ShapeOfEntityShell); // an "as" assertion, to have types for all properties
+      const entityShell = await EntityShellModel.findById(shellId).exec();
+      console.log(entityShell)
+      
+      return runtime.text(200, `${entity?.id} + ${entity?.name}`);
     }
   }
 };
@@ -64,6 +84,6 @@ const app = new Koa();
 // we need a bodyparser to make body contain json and deal with multipart requests
 app.use(koaBody({ multipart: true }));
 app.use(routes.routes());
-console.log("Starting server.");
+console.log("Starting server");
 // start the server!
 app.listen(3000);
