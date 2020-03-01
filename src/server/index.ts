@@ -8,7 +8,7 @@ import * as mongoose from 'mongoose';
 import { getModelForClass } from '@typegoose/typegoose';
 import injectTypegooseDecorators from './injector';
 
-mongoose.connect('mongodb://localhost:27017/tonto', {useNewUrlParser: true, useUnifiedTopology: true, dbName: 'tonto'})
+mongoose.connect('mongodb://mongo:27017/tonto', {useNewUrlParser: true, useUnifiedTopology: true, dbName: 'tonto'})
   .then((m) => console.log('Successfully connected to mongodb'))
   .catch((err) => console.error(err));
 
