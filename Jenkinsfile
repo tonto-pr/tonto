@@ -1,10 +1,14 @@
 pipeline {
+    environment {
+        registry = "antoinert/tonto"
+        registryCredential = 'dockerhub'
+    }
     agent any
     stages {
-        stage('Install packages') {
+        stage('Build image') {
             steps {
                 script {
-                    sh 'yarn install'
+                    docker.build registry + ":$BUILD_NUMBER"
                 }
             }
         }
