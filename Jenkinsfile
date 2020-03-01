@@ -1,15 +1,29 @@
 pipeline {
     environment {
-        registry = "antoinert/tonto"
         registryCredential = 'dockerhub'
+        dockerImage = "antoinert/tonto:$BUILD_NUMBER"
     }
     agent any
     stages {
         stage('Build image') {
             steps {
                 script {
-                    docker.build registry + ":$BUILD_NUMBER"
+                    sh 'docker-compose build web'
                 }
+            }
+        }
+        stage('Push image to image registry') {
+            steps {
+                script {
+                    docker.withRegistry('', registryCredential) {
+                        sh "docker push $dockerImage"
+                    }
+                }
+            }
+        }
+        stage('Remove local docker image') {
+            steps{
+                sh "docker rmi $dockerImage"
             }
         }
         stage('Generate necessary OpenAPI files') {
@@ -22,8 +36,7 @@ pipeline {
         stage('Launch server') {
             steps {
                 script {
-                    sh 'pm2 delete all'
-                    sh 'pm2 start yarn --interpreter bash --name api -- start'
+                    sh 'docker run -d $registry:$BUILD_NUMBER'
                 }
             }
         }
