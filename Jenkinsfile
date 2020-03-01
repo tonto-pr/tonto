@@ -1,7 +1,7 @@
 pipeline {
     environment {
         registryCredential = 'dockerhub'
-        dockerImage = "antoinert/tonto:$BUILD_NUMBER"
+        dockerImage = "antoinert/tonto"
     }
     agent any
     stages {
@@ -36,7 +36,7 @@ pipeline {
         stage('Launch server') {
             steps {
                 script {
-                    sh 'docker run -d $registry:$BUILD_NUMBER'
+                    sh 'docker-compose run web'
                 }
             }
         }
