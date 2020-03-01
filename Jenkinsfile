@@ -23,7 +23,7 @@ pipeline {
         }
         stage('Remove local docker image') {
             steps{
-                sh "docker rmi $dockerImage"
+                sh "docker rmi -f $dockerImage"
             }
         }
         stage('Generate necessary OpenAPI files') {
