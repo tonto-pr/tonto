@@ -36,7 +36,7 @@ pipeline {
         stage('Launch server') {
             steps {
                 script {
-                    sh 'docker-compose run -d web'
+                    sh 'docker-compose up'
                 }
             }
         }
