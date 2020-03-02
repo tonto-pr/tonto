@@ -122,6 +122,22 @@ paths:
                 $ref: '#/components/schemas/Entity'
         404:
           $ref: '#/components/responses/NotFound'
+  /entities:
+    get:
+      tags:
+      - Get all entities
+      summary: "Get all entities"
+      operationId: GetEntities
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Entity'
+        404:
+          $ref: '#/components/responses/NotFound'
   /test:
     get:
       tags:

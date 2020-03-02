@@ -58,6 +58,15 @@ const spec: api.Endpoints = {
       return runtime.json(404, { message: 'not found', status: 404 });
     }
   },
+  '/entities': {
+    get: async ctx => {
+      const entities = await EntityModel.find({});
+      if (entities) {
+        return runtime.json(200, entities);
+      }
+      return runtime.json(404, { message: 'not found', status: 404 });
+    }
+  },
   '/test': {
     get: async ctx => {
       const { _id: id } = await EntityModel.create({id: '12', name: 'hello'} as types.ShapeOfEntity); // an "as" assertion, to have types for all properties
