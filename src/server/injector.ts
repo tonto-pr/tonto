@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import * as types from '../../common.types.generated';
+import * as types from '../../generated/common.types.generated';
 import safe from '@smartlyio/safe-navigation';
 import * as oas from 'openapi3-ts';
 import * as fs from 'fs';

@@ -1,5 +1,5 @@
-import * as api from '../../server.generated';
-import * as types from '../../common.types.generated';
+import * as api from '../../generated/server.generated';
+import * as types from '../../generated/common.types.generated';
 import * as runtime from '@smartlyio/oats-runtime';
 import * as koaAdapter from '@smartlyio/oats-koa-adapter';
 import * as Koa from 'koa';

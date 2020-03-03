@@ -1,8 +1,11 @@
 FROM node:12.16.1-alpine3.9
 
 ADD package.json ./tmp/package.json
+ADD generator.ts ./tmp/generator.ts
+ADD openapi.yml ./tmp/openapi.yml
 RUN cd /tmp && yarn install
-RUN mkdir -p /usr/src/app && cp -a /tmp/node_modules /usr/src/app
+RUN cd /tmp && yarn generate
+RUN mkdir -p /usr/src/app && cp -a /tmp/node_modules /usr/src/app && cp -a /tmp/generated /usr/src/app
 
 WORKDIR /usr/src/app
 
@@ -10,5 +13,4 @@ ADD . /usr/src/app
 
 EXPOSE 3000
 
-CMD ["yarn", "generate"]
 CMD ["yarn", "start"]

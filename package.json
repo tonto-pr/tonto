@@ -9,7 +9,7 @@
   "scripts": {
     "start": "ts-node src/server/index.ts",
     "start-client": "ts-node src/client/client.ts",
-    "generate": "ts-node generator.ts",
+    "generate": "mkdir generated && ts-node generator.ts",
     "tsc": "tsc",
     "dev": "./node_modules/nodemon/bin/nodemon.js"
   },
