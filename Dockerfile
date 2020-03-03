@@ -10,4 +10,5 @@ ADD . /usr/src/app
 
 EXPOSE 3000
 
+CMD ["yarn", "generate"]
 CMD ["yarn", "start"]

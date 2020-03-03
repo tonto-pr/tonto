@@ -26,13 +26,6 @@ pipeline {
                 sh "docker rmi -f $dockerImage"
             }
         }
-        stage('Generate necessary OpenAPI files') {
-            steps {
-                script {
-                    sh 'yarn generate'
-                }
-            }
-        }
         stage('Launch server') {
             steps {
                 script {
