@@ -11,7 +11,9 @@
     "start-client": "ts-node src/client/client.ts",
     "generate": "mkdir generated && ts-node generator.ts",
     "tsc": "tsc",
-    "dev": "./node_modules/nodemon/bin/nodemon.js"
+    "dev": "./node_modules/nodemon/bin/nodemon.js",
+    "decrypt": "sops --input-type dotenv -d -i .env",
+    "encrypt": "sops --input-type dotenv -e -i .env"
   },
   "dependencies": {
     "@smartlyio/oats": "^1.5.0",
@@ -23,8 +25,10 @@
     "@types/koa": "^2.0.39",
     "@types/koa-router": "^7.0.23",
     "@types/mongoose": "^5.7.1",
+    "@types/node": "^13.9.2",
     "assert": "^2.0.0",
     "axios": "^0.18.0",
+    "dotenv": "^8.2.0",
     "koa": "^2.11.0",
     "koa-body": "^4.1.1",
     "koa-router": "^7.2.1",
