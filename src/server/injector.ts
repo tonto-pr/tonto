@@ -8,7 +8,7 @@ import * as yaml from 'js-yaml';
 const openApiFilePath = './openapi.yml';
 
 interface Types {
-    [key: string]: Function
+    [key: string]: any
 }
 
 interface SchemaDetail {
