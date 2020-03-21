@@ -11,7 +11,7 @@ RUN mkdir -p /usr/src/app && cp -a /tmp/node_modules /usr/src/app && cp -a /tmp/
 WORKDIR /usr/src/app
 
 ADD . /usr/src/app
-RUN cd generated && ls
+RUN cd generated && cat common.types.generated.ts
 EXPOSE 3000
 
 CMD ["yarn", "start"]
