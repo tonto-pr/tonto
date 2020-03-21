@@ -5,13 +5,6 @@ pipeline {
     }
     agent any
     stages {
-        stage('Decrypt secrets') {
-            steps {
-                script {
-                    sh 'sops --input-type dotenv -d -i .env'
-                }
-            }
-        }
         stage('Build image') {
             steps {
                 script {
