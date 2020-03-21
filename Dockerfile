@@ -1,5 +1,6 @@
 FROM node:12.16.1-alpine3.9
 
+RUN ls
 ADD package.json ./tmp/package.json
 ADD generator.ts ./tmp/generator.ts
 ADD openapi.yml ./tmp/openapi.yml
