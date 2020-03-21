@@ -11,9 +11,7 @@
     "start-client": "ts-node src/client/client.ts",
     "generate": "mkdir generated && ts-node generator.ts",
     "tsc": "tsc",
-    "dev": "./node_modules/nodemon/bin/nodemon.js",
-    "decrypt": "sops --input-type dotenv -d -i .env",
-    "encrypt": "sops --input-type dotenv -e -i .env"
+    "dev": "./node_modules/nodemon/bin/nodemon.js"
   },
   "dependencies": {
     "@smartlyio/oats": "^1.5.0",
