@@ -5,11 +5,12 @@ import * as koaAdapter from '@smartlyio/oats-koa-adapter';
 import * as Koa from 'koa';
 import * as koaBody from 'koa-body';
 import * as mongoose from 'mongoose';
+import { DB_ADDRESS } from '../config';
 
 import { getModelForClass } from '@typegoose/typegoose';
 import injectTypegooseDecorators from './injector';
 
-mongoose.connect('mongodb://mongo:27017/tonto', {useNewUrlParser: true, useUnifiedTopology: true, dbName: 'tonto'})
+mongoose.connect(DB_ADDRESS, {useNewUrlParser: true, useUnifiedTopology: true, dbName: 'tonto'})
   .then((m) => console.log('Successfully connected to mongodb'))
   .catch((err) => console.error(err));
 

@@ -1,0 +1,3 @@
+creation_rules:
+  - path_regex: \.env
+    kms: 'arn:aws:kms:eu-central-1:968489688189:key/d726a4f0-0e7f-4b51-bef1-f1faa218ca4d'
