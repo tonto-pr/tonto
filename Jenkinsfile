@@ -20,6 +20,11 @@ pipeline {
             }
         }
         stage('Push image to image registry') {
+            when {
+                expression {
+                return env.BRANCH_NAME == 'master'
+                }
+            }
             steps {
                 script {
                     docker.withRegistry('', registryCredential) {
@@ -34,6 +39,11 @@ pipeline {
             }
         }
         stage('Launch server') {
+            when {
+                expression {
+                return env.BRANCH_NAME == 'master'
+                }
+            }
             steps {
                 script {
                     sh 'docker-compose up -d'
