@@ -24,7 +24,7 @@
     "@smartlyio/safe-navigation" "^4.0.1"
     lodash "^4.17.4"
 
-"@smartlyio/oats@^1.5.0":
+"@smartlyio/oats@1.7.1":
   version "1.7.1"
   resolved "https://registry.yarnpkg.com/@smartlyio/oats/-/oats-1.7.1.tgz#0b6f3543c3e31c6d1474c127e45081fb2eed1a5e"
   integrity sha512-PdEbR2Ij+zB/ppBuCti4Iat29VT51B3mhC4F9boBp1DIBUN+lEKNllxF5D/nFCD5jyL65+W3gvv5ovw0G6Kp3g==
