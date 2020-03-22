@@ -13,7 +13,8 @@
     "tsc": "tsc",
     "dev": "./node_modules/nodemon/bin/nodemon.js",
     "encrypt": "sops --input-type dotenv -e -i .env",
-    "decrypt": "sops --input-type dotenv -d -i .env"
+    "decrypt": "sops --input-type dotenv -d -i .env",
+    "test": "jest"
   },
   "dependencies": {
     "@smartlyio/oats": "1.7.1",
@@ -22,12 +23,14 @@
     "@smartlyio/oats-runtime": "^1.0.3",
     "@smartlyio/safe-navigation": "^4.0.1",
     "@typegoose/typegoose": "^6.4.0",
+    "@types/jest": "^25.1.4",
     "@types/koa": "^2.0.39",
     "@types/koa-router": "^7.0.23",
     "@types/mongoose": "^5.7.1",
     "assert": "^2.0.0",
     "axios": "^0.18.0",
     "dotenv": "^8.2.0",
+    "jest": "^25.1.0",
     "koa": "^2.11.0",
     "koa-body": "^4.1.1",
     "koa-router": "^7.2.1",
@@ -35,6 +38,7 @@
     "nodemon": "^2.0.2",
     "reflect-metadata": "^0.1.13",
     "ts-helpers": "^1.1.2",
+    "ts-jest": "^25.2.1",
     "ts-node": "^8.6.2",
     "typescript": "^3.8.2"
   }
