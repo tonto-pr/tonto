@@ -20,7 +20,6 @@ const EntityModel = getModelForClass(types.Entity);
 const EntityShellModel = getModelForClass(types.EntityShell);
 const ErrorModel = getModelForClass(types.Error);
 
-// setup a db :)
 const values: { [key: string]: types.Entity } = {};
 
 // 'api.Endpoints' is the generated type of the server
