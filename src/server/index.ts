@@ -22,7 +22,6 @@ const ErrorModel = getModelForClass(types.Error);
 
 const values: { [key: string]: types.Entity } = {};
 
-// 'api.Endpoints' is the generated type of the server
 const spec: api.Endpoints = {
   '/entity': {
     post: async ctx => {
