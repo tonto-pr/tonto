@@ -20,10 +20,8 @@ const EntityModel = getModelForClass(types.Entity);
 const EntityShellModel = getModelForClass(types.EntityShell);
 const ErrorModel = getModelForClass(types.Error);
 
-// setup a db :)
 const values: { [key: string]: types.Entity } = {};
 
-// 'api.Endpoints' is the generated type of the server
 const spec: api.Endpoints = {
   '/entity': {
     post: async ctx => {
@@ -87,14 +85,12 @@ const spec: api.Endpoints = {
   }
 };
 
-// 'koaAdapter.bind'  binds the endpoint implemantion in'spec' to koa-router routes using a koa adapter
 const routes = koaAdapter.bind(api.router, spec);
 
-// finally we can create a Koa app from the routes
 const app = new Koa();
-// we need a bodyparser to make body contain json and deal with multipart requests
+
 app.use(koaBody({ multipart: true }));
 app.use(routes.routes());
 console.log("Starting server");
-// start the server!
+
 app.listen(3000);
