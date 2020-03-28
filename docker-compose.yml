@@ -11,3 +11,8 @@ services:
     image: mongo
     ports:
     - "27017:27017"
+    volumes:
+    - mongo-backup:/data/db
+
+volumes:
+  mongo-backup:
