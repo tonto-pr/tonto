@@ -8,50 +8,52 @@ import * as mongoose from 'mongoose';
 import { DB_ADDRESS } from '../config';
 
 import { getModelForClass } from '@typegoose/typegoose';
-import injectTypegooseDecorators from './injector';
+import { injectProps } from './injector';
 
 mongoose.connect(DB_ADDRESS, {useNewUrlParser: true, useUnifiedTopology: true, dbName: 'tonto'})
   .then((m) => console.log('Successfully connected to mongodb'))
   .catch((err) => console.error(err));
 
-injectTypegooseDecorators();
+injectProps(types.PlainFine, [{ name: 'name', type: 'string'}])
 
-const FineModel = getModelForClass(types.Fine);
-const ErrorModel = getModelForClass(types.Error);
-
-const values: { [key: string]: types.Fine } = {};
+const PlainFineModel = getModelForClass(types.PlainFine);
 
 const spec: api.Endpoints = {
   '/fine': {
     post: async ctx => {
-      values[ctx.body.value.id] = types.Fine.make({
-        id: ctx.body.value.id,
-        name: ctx.body.value.name
-      }).success();
-      return runtime.json(200, values[ctx.body.value.id]);
+      const temp_fine = await PlainFineModel.create(ctx.body.value as types.ShapeOfPlainFine);
+
+      if (temp_fine) {
+        const fine: types.ShapeOfFine = {...temp_fine.toObject(), _id: temp_fine.id}
+        return runtime.json(200, fine);
+      }
+      return runtime.json(404, { message: 'not found', status: 404 })
     }
   },
   '/fine/{fineId}': {
     delete: async ctx => {
-      const fine = values[ctx.params.fineId]
+      const temp_fine = await PlainFineModel.findOneAndDelete({ _id: ctx.params.fineId });
 
-      if (fine) {
-        const temp_name = fine.name;
-        delete values[ctx.params.fineId];
-        return runtime.json(200, {id: ctx.params.fineId, name: temp_name});
+      if (temp_fine) {
+        const fine: types.ShapeOfFine = {...temp_fine.toObject(), _id: temp_fine.id}
+        return runtime.json(200, fine);
       }
       return runtime.json(404, { message: 'not found', status: 404 });
     },
     get: async ctx => {
-      const fine = values[ctx.params.fineId];
-      if (fine) {
+      let temp_fine = await PlainFineModel.findById(ctx.params.fineId).exec();
+
+      if (temp_fine) {
+        const fine: types.ShapeOfFine = {...temp_fine.toObject(), _id: temp_fine.id}
         return runtime.json(200, fine);
       }
       return runtime.json(404, { message: 'not found', status: 404 });
     },
     put: async ctx => {
-      const fine = values[ctx.params.fineId];
-      if (fine) {
+      const temp_fine = await PlainFineModel.findOneAndUpdate({ _id: ctx.params.fineId }, ctx.body.value, { upsert: true, new: true }).exec();
+
+      if (temp_fine) {
+        const fine: types.ShapeOfFine = {...temp_fine.toObject(), _id: temp_fine.id}
         return runtime.json(200, fine);
       }
       return runtime.json(404, { message: 'not found', status: 404 });
@@ -59,8 +61,12 @@ const spec: api.Endpoints = {
   },
   '/fines': {
     get: async ctx => {
-      const fines = await FineModel.find({});
-      if (fines) {
+      const temp_fines = await PlainFineModel.find({});
+
+      if (temp_fines) {
+        const fines = temp_fines.map(fine => {
+          return {...fine.toObject(), _id: fine.id} as types.ShapeOfFine
+        })
         return runtime.json(200, fines);
       }
       return runtime.json(404, { message: 'not found', status: 404 });
@@ -68,14 +74,9 @@ const spec: api.Endpoints = {
   },
   '/test': {
     get: async ctx => {
-      const { _id: id } = await FineModel.create({id: '12', name: 'hello'} as types.ShapeOfFine); // an "as" assertion, to have types for all properties
-      const fine = await FineModel.findById(id).exec();
+      const fine: types.ShapeOfFine = await PlainFineModel.create({name: 'hello'} as types.ShapeOfPlainFine);
 
-      const { _id: status } = await ErrorModel.create({status: 400, message: 'hello'} as types.ShapeOfError); // an "as" assertion, to have types for all properties
-      const error = await ErrorModel.findById(status).exec();
-      console.log(error)
-      
-      return runtime.text(200, `${fine?.id} + ${fine?.name}`);
+      return runtime.text(200, `${fine._id} + ${fine?.name}`);
     }
   }
 };

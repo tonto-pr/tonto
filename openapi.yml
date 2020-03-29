@@ -8,7 +8,7 @@ info:
     url: "https://www.leivalle.org"
     email: "anton.rautio@gmail.com"
 servers:
-  - url: "http://api.leivalle.org"
+  - url: "https://api.leivalle.org"
     description: "Production API"
 paths:
   /fine:
@@ -17,14 +17,14 @@ paths:
       - New fine
       summary: "Create new fines."
       description: "Create new fines to the database."
-      operationId: CreateEntities
+      operationId: CreateFines
       requestBody:
         description: Fine body
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Fine'
+              $ref: '#/components/schemas/PlainFine'
       responses:
         200:
           description: Successful response
@@ -42,7 +42,7 @@ paths:
       - Read Fine
       summary: "Read fines."
       description: "Read fines from the database."
-      operationId: ReadEntities
+      operationId: ReadFines
       parameters:
       - name: fineId
         in: path
@@ -67,7 +67,7 @@ paths:
       - Update fines
       summary: "Update fines."
       description: "Update fines in the database."
-      operationId: UpdateEntities
+      operationId: UpdateFines
       parameters:
       - name: fineId
         in: path
@@ -82,7 +82,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Fine'
+              $ref: '#/components/schemas/PlainFine'
             example:
               id: 123
               name: Anton
@@ -102,7 +102,7 @@ paths:
       - Delete fines
       summary: "Delete fines."
       description: "Delete fines from the database."
-      operationId: DeleteEntities
+      operationId: DeleteFines
       parameters:
       - name: fineId
         in: path
@@ -127,7 +127,7 @@ paths:
       tags:
       - Get all fines
       summary: "Get all fines"
-      operationId: GetEntities
+      operationId: GetFines
       responses:
         200:
           content:
@@ -152,16 +152,22 @@ paths:
                 type: string
 components:
   schemas:
-    Fine:
+    PlainFine:
       type: object
       properties:
-        id:
-          type: string
         name:
           type: string
       required:
-        - id
         - name
+    Fine:
+      allOf:
+        - $ref: '#/components/schemas/PlainFine'
+        - type: object
+          properties:
+            _id:
+              type: string
+          required:
+            - _id
     Error:
       type: object
       properties:
