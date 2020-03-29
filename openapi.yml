@@ -8,45 +8,45 @@ info:
     url: "https://www.leivalle.org"
     email: "anton.rautio@gmail.com"
 servers:
-  - url: "http://api.leivalle.org"
+  - url: "https://api.leivalle.org"
     description: "Production API"
 paths:
-  /entity:
+  /fine:
     post:
       tags:
-      - New entity
-      summary: "Create new entities."
-      description: "Create new entities to the database."
-      operationId: CreateEntities
+      - New fine
+      summary: "Create new fines."
+      description: "Create new fines to the database."
+      operationId: CreateFines
       requestBody:
-        description: Entity body
+        description: Fine body
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Entity'
+              $ref: '#/components/schemas/PlainFine'
       responses:
         200:
           description: Successful response
           content:
             application/json:
               schema:
-                title: Entity created
+                title: Fine created
                 type: object
-                $ref: '#/components/schemas/Entity'
+                $ref: '#/components/schemas/Fine'
         404:
           $ref: '#/components/responses/NotFound'
-  /entity/{entityId}:
+  /fine/{fineId}:
     get:
       tags:
-      - Read Entity
-      summary: "Read entities."
-      description: "Read entities from the database."
-      operationId: ReadEntities
+      - Read Fine
+      summary: "Read fines."
+      description: "Read fines from the database."
+      operationId: ReadFines
       parameters:
-      - name: entityId
+      - name: fineId
         in: path
-        description: "**Entity id** *Example: 1*"
+        description: "**Fine id** *Example: 1*"
         required: true
         schema:
           type: string
@@ -57,32 +57,32 @@ paths:
           content:
             application/json:
               schema:
-                title: Entity found
+                title: Fine found
                 type: object
-                $ref: '#/components/schemas/Entity'
+                $ref: '#/components/schemas/Fine'
         404: 
           $ref: '#/components/responses/NotFound'
     put:
       tags:
-      - Update entities
-      summary: "Update entities."
-      description: "Update entities in the database."
-      operationId: UpdateEntities
+      - Update fines
+      summary: "Update fines."
+      description: "Update fines in the database."
+      operationId: UpdateFines
       parameters:
-      - name: entityId
+      - name: fineId
         in: path
-        description: "**Entity id** *Example: 1*"
+        description: "**Fine id** *Example: 1*"
         required: true
         schema:
           type: string
           minimum: 1
       requestBody:
-        description: Entity body
+        description: Fine body
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Entity'
+              $ref: '#/components/schemas/PlainFine'
             example:
               id: 123
               name: Anton
@@ -92,21 +92,21 @@ paths:
           content:
             application/json:
               schema:
-                title: Entity updated
+                title: Fine updated
                 type: object
-                $ref: '#/components/schemas/Entity'
+                $ref: '#/components/schemas/Fine'
         404:
           $ref: '#/components/responses/NotFound'
     delete:
       tags:
-      - Delete entities
-      summary: "Delete entities."
-      description: "Delete entities from the database."
-      operationId: DeleteEntities
+      - Delete fines
+      summary: "Delete fines."
+      description: "Delete fines from the database."
+      operationId: DeleteFines
       parameters:
-      - name: entityId
+      - name: fineId
         in: path
-        description: "**Entity id** *Example: 1*"
+        description: "**Fine id** *Example: 1*"
         required: true
         schema:
           type: string
@@ -117,17 +117,17 @@ paths:
           content:
             application/json:
               schema:
-                title: Entity deleted
+                title: Fine deleted
                 type: object
-                $ref: '#/components/schemas/Entity'
+                $ref: '#/components/schemas/Fine'
         404:
           $ref: '#/components/responses/NotFound'
-  /entities:
+  /fines:
     get:
       tags:
-      - Get all entities
-      summary: "Get all entities"
-      operationId: GetEntities
+      - Get all fines
+      summary: "Get all fines"
+      operationId: GetFines
       responses:
         200:
           content:
@@ -135,7 +135,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Entity'
+                  $ref: '#/components/schemas/Fine'
         404:
           $ref: '#/components/responses/NotFound'
   /test:
@@ -152,23 +152,22 @@ paths:
                 type: string
 components:
   schemas:
-    EntityShell:
+    PlainFine:
       type: object
       properties:
-        shellId:
-          type: string
-        childEntity:
-          $ref: '#/components/schemas/Entity'
-    Entity:
-      type: object
-      properties:
-        id:
-          type: string
         name:
           type: string
       required:
-        - id
         - name
+    Fine:
+      allOf:
+        - $ref: '#/components/schemas/PlainFine'
+        - type: object
+          properties:
+            _id:
+              type: string
+          required:
+            - _id
     Error:
       type: object
       properties:
@@ -181,7 +180,7 @@ components:
         - message
   responses:
     NotFound:
-      description: The specified entity was not found
+      description: The specified fine was not found
       content:
         application/json:
           schema:
