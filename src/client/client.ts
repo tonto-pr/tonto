@@ -11,7 +11,7 @@ import * as assert from 'assert';
   const fines = await apiClient.fines.get();
   console.log('fines', fines);
   const posted = await apiClient.fine.post({
-    body: runtime.client.json({ name: 'testo' })
+    body: runtime.client.json({ receiverName: 'testo', amount: 1000, description: 'sakko.appin kehitys' })
   });
   console.log('posted', posted)
   if (posted.status !== 200) assert.fail('wrong response');
@@ -20,8 +20,9 @@ import * as assert from 'assert';
   if (stored.status !== 200) assert.fail('wrong response');
   console.log('stored', stored)
   const putted = await apiClient.fine(posted.value.value._id).put({
-    body: runtime.client.json({ name: 'anton' })
+    body: runtime.client.json({ receiverName: 'anton', amount: 1000, description: 'sakko.appin kehitys'})
   });
+  assert(putted.value.value.receiverName === 'anton')
   console.log('putted', putted)
   const stored2 = await apiClient.fine(posted.value.value._id).get();
   console.log('stored2', stored2)
