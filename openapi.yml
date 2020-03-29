@@ -83,9 +83,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PlainFine'
-            example:
-              id: 123
-              name: Anton
       responses:
         200:
           description: Successful response
@@ -155,10 +152,16 @@ components:
     PlainFine:
       type: object
       properties:
-        name:
+        receiverName:
+          type: string
+        amount:
+          type: integer
+        description:
           type: string
       required:
-        - name
+        - receiverName
+        - amount
+        - description
     Fine:
       allOf:
         - $ref: '#/components/schemas/PlainFine'

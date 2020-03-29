@@ -14,7 +14,7 @@ mongoose.connect(DB_ADDRESS, {useNewUrlParser: true, useUnifiedTopology: true, d
   .then((m) => console.log('Successfully connected to mongodb'))
   .catch((err) => console.error(err));
 
-injectProps(types.PlainFine, [{ name: 'name', type: 'string'}])
+injectProps(types.PlainFine, [{ name: 'receiverName', type: 'string'}, { name: 'amount', type: 'integer'}, { name: 'description', type: 'string'}])
 
 const PlainFineModel = getModelForClass(types.PlainFine);
 
@@ -74,9 +74,9 @@ const spec: api.Endpoints = {
   },
   '/test': {
     get: async ctx => {
-      const fine: types.ShapeOfFine = await PlainFineModel.create({name: 'hello'} as types.ShapeOfPlainFine);
+      const fine: types.ShapeOfFine = await PlainFineModel.create({receiverName: 'sihteeri', amount: 10, description: 'sakko.appin laiminlyönti'} as types.ShapeOfPlainFine);
 
-      return runtime.text(200, `${fine._id} + ${fine?.name}`);
+      return runtime.text(200, `${fine._id} + ${fine.receiverName} + ${fine.amount} + ${fine.description}`);
     }
   }
 };
