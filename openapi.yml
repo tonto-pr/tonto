@@ -135,6 +135,94 @@ paths:
                   $ref: '#/components/schemas/Fine'
         404:
           $ref: '#/components/responses/NotFound'
+  /user:
+    post:
+      tags:
+      - New fine
+      summary: "Create new userss."
+      description: "Create new users to the database."
+      operationId: CreateUsers
+      requestBody:
+        description: User body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlainUser'
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: User created
+                type: object
+                $ref: '#/components/schemas/User'
+        403:
+          $ref: '#/components/responses/AlreadyExists'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /user/{userId}:
+    get:
+      tags:
+      - Read User
+      summary: "Read users."
+      description: "Read users from the database."
+      operationId: ReadUsers
+      parameters:
+      - name: userId
+        in: path
+        description: "**User id** *Example: 1*"
+        required: true
+        schema:
+          type: string
+          minimum: 1
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: User found
+                type: object
+                $ref: '#/components/schemas/User'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /users:
+    get:
+      tags:
+      - Get all users
+      summary: "Get all users"
+      operationId: GetUsers
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /login:
+    post:
+      requestBody:
+        description: User login
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                type: string
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
   /test:
     get:
       tags:
@@ -149,6 +237,28 @@ paths:
                 type: string
 components:
   schemas:
+    PlainUser:
+      type: object
+      properties:
+        email:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - username
+        - password
+    User:
+      allOf:
+        - $ref: '#/components/schemas/PlainUser'
+        - type: object
+          properties:
+            _id:
+              type: string
+          required:
+            - _id
     PlainFine:
       type: object
       properties:
@@ -181,9 +291,29 @@ components:
       required:
         - status
         - message
+    UserLogin:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
   responses:
     NotFound:
       description: The specified fine was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    AlreadyExists:
       content:
         application/json:
           schema:
