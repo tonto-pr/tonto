@@ -16,11 +16,13 @@ mongoose.connect(DB_ADDRESS, {useNewUrlParser: true, useUnifiedTopology: true, d
   .then((m) => console.log('Successfully connected to mongodb'))
   .catch((err) => console.error(err));
 
-injectProps(types.PlainFine, [{ name: 'receiverName', type: 'string'}, { name: 'amount', type: 'integer'}, { name: 'description', type: 'string'}])
-injectProps(types.PlainUser, [{ name: 'email', type: 'string'}, { name: 'username', type: 'string'}, { name: 'password', type: 'string'}])
+injectProps(types.PlainFine, [{ name: 'receiverName', type: 'string' }, { name: 'amount', type: 'integer' }, { name: 'description', type: 'string' }])
+injectProps(types.PlainUser, [{ name: 'email', type: 'string' }, { name: 'username', type: 'string' }, { name: 'password', type: 'string' }])
+injectProps(types.PlainGroup, [{ name: 'members', type: 'object' }, { name: 'groupName', type: 'string' }])
 
 const PlainFineModel = getModelForClass(types.PlainFine);
 const PlainUserModel = getModelForClass(types.PlainUser);
+const PlainGroupModel = getModelForClass(types.PlainGroup);
 
 const spec: api.Endpoints = {
   '/fine': {
@@ -65,7 +67,7 @@ const spec: api.Endpoints = {
   },
   '/fines': {
     get: async ctx => {
-      const temp_fines = await PlainFineModel.find({});
+      const temp_fines = await PlainFineModel.find({}).exec();
 
       if (temp_fines) {
         const fines = temp_fines.map(fine => {
@@ -84,6 +86,10 @@ const spec: api.Endpoints = {
         return runtime.json(403, { message: 'username already exists', status: 403 })
       }
 
+      if (!ctx.body.value.password) {
+        return runtime.json(500, { message: 'please provide a password', status: 500 })
+      }
+
       const encrypted_user = { ...ctx.body.value }
       encrypted_user.password = bcrypt.hashSync(ctx.body.value.password, 10);
       const temp_user = await PlainUserModel.create(encrypted_user as types.ShapeOfPlainUser);
@@ -96,8 +102,17 @@ const spec: api.Endpoints = {
     }
   },
   '/user/{userId}': {
+    delete: async ctx => {
+      const temp_user = await PlainUserModel.findOneAndDelete({ _id: ctx.params.userId });
+
+      if (temp_user) {
+        const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
+        return runtime.json(200, user);
+      }
+      return runtime.json(404, { message: 'not found', status: 404 });
+    },
     get: async ctx => {
-      let temp_user = await PlainUserModel.findById(ctx.params.userId).exec();
+      let temp_user = await PlainUserModel.findById(ctx.params.userId).select("-password").exec();
 
       if (temp_user) {
         const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
@@ -108,13 +123,90 @@ const spec: api.Endpoints = {
   },
   '/users': {
     get: async ctx => {
-      const temp_users = await PlainUserModel.find({});
+      const temp_users = await PlainUserModel.find({}).select("-password").exec();
 
       if (temp_users) {
-        const users = temp_users.map(user => {
-          return {...user.toObject(), _id: user.id} as types.ShapeOfUser
+        const users = temp_users.map(temp_user => {
+          const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
+          return user
         })
         return runtime.json(200, users);
+      }
+      return runtime.json(404, { message: 'not found', status: 404 });
+    }
+  },
+  '/group': {
+    post: async ctx => {
+      const groupBody = { ...ctx.body.value };
+
+      if (!groupBody.members) {
+        groupBody.members = []
+      }
+
+      const existing_group = await PlainGroupModel.findOne({ groupName: ctx.body.value.groupName }).exec();
+
+      if (existing_group) {
+        return runtime.json(403, { message: 'group name already exists', status: 403 })
+      }
+
+      const temp_group = await PlainGroupModel.create(groupBody as types.ShapeOfPlainGroup);
+
+      if (temp_group) {
+        const group: types.ShapeOfGroup = {...temp_group.toObject(), _id: temp_group.id}
+        return runtime.json(200, group);
+      }
+      return runtime.json(404, { message: 'not found', status: 404 })
+    }
+  },
+  '/group/{groupId}': {
+    delete: async ctx => {
+      const temp_group = await PlainGroupModel.findOneAndDelete({ _id: ctx.params.groupId });
+
+      if (temp_group) {
+        const group: types.ShapeOfGroup = {...temp_group.toObject(), _id: temp_group.id}
+        return runtime.json(200, group);
+      }
+      return runtime.json(404, { message: 'not found', status: 404 });
+    },
+    get: async ctx => {
+      let temp_group = await PlainGroupModel.findById(ctx.params.groupId).exec();
+
+      if (temp_group) {
+        const group: types.ShapeOfGroup = {...temp_group.toObject(), _id: temp_group.id}
+        return runtime.json(200, group);
+      }
+      return runtime.json(404, { message: 'not found', status: 404 });
+    }
+  },
+  '/group/{groupId}/members': {
+    get: async ctx => {
+      let temp_group = await PlainGroupModel.findById(ctx.params.groupId).exec();
+
+      if (!temp_group) {
+        return runtime.json(404, { message: 'not found', status: 404 });
+      }
+
+      const groupMembers = await PlainUserModel.find({_id: { $in: temp_group.members }}).select('-password').exec();
+
+      if (groupMembers) {
+        const users = groupMembers.map(temp_user => {
+          const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
+          return user
+        })
+        return runtime.json(200, users);
+      }
+      return runtime.json(404, { message: 'not found', status: 404 });
+    }
+  },
+  '/groups': {
+    get: async ctx => {
+      const temp_groups = await PlainGroupModel.find({});
+
+      if (temp_groups) {
+        const groups = temp_groups.map(group => {
+          return {...group.toObject(), _id: group.id} as types.ShapeOfGroup
+        })
+        return runtime.json(200, groups);
       }
       return runtime.json(404, { message: 'not found', status: 404 });
     }
@@ -123,6 +215,9 @@ const spec: api.Endpoints = {
     post: async ctx => {
       const user = await PlainUserModel.findOne({ username: ctx.body.value.username }).exec();
       if (user) {
+        if (!user.password) {
+          return runtime.json(500, { message: 'please provide a password', status: 500 });
+        }
         if(!bcrypt.compareSync(ctx.body.value.password, user.password)) {
           return runtime.json(401, { message: 'unauthorized', status: 401 });
         } else {
