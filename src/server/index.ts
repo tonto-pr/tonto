@@ -5,6 +5,7 @@ import * as koaAdapter from '@smartlyio/oats-koa-adapter';
 import * as Koa from 'koa';
 import * as koaBody from 'koa-body';
 import * as mongoose from 'mongoose';
+
 import { DB_ADDRESS } from '../config';
 
 import { getModelForClass } from '@typegoose/typegoose';
@@ -15,8 +16,10 @@ mongoose.connect(DB_ADDRESS, {useNewUrlParser: true, useUnifiedTopology: true, d
   .catch((err) => console.error(err));
 
 injectProps(types.PlainFine, [{ name: 'receiverName', type: 'string'}, { name: 'amount', type: 'integer'}, { name: 'description', type: 'string'}])
+injectProps(types.PlainUser, [{ name: 'email', type: 'string'}, { name: 'username', type: 'string'}, { name: 'password', type: 'string'}])
 
 const PlainFineModel = getModelForClass(types.PlainFine);
+const PlainUserModel = getModelForClass(types.PlainUser);
 
 const spec: api.Endpoints = {
   '/fine': {
@@ -72,10 +75,46 @@ const spec: api.Endpoints = {
       return runtime.json(404, { message: 'not found', status: 404 });
     }
   },
+  '/user': {
+    post: async ctx => {
+      const temp_user = await PlainUserModel.create(ctx.body.value as types.ShapeOfPlainUser);
+      console.log(temp_user)
+      if (temp_user) {
+        const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
+        return runtime.json(200, user);
+      }
+      return runtime.json(404, { message: 'not found', status: 404 })
+    }
+  },
+  '/user/{userId}': {
+    get: async ctx => {
+      let temp_user = await PlainUserModel.findById(ctx.params.userId).exec();
+
+      if (temp_user) {
+        const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
+        return runtime.json(200, user);
+      }
+      return runtime.json(404, { message: 'not found', status: 404 });
+    }
+  },
+  '/users': {
+    get: async ctx => {
+      const temp_users = await PlainUserModel.find({});
+
+      if (temp_users) {
+        const users = temp_users.map(user => {
+          return {...user.toObject(), _id: user.id} as types.ShapeOfUser
+        })
+        return runtime.json(200, users);
+      }
+      return runtime.json(404, { message: 'not found', status: 404 });
+    }
+  },
   '/test': {
     get: async ctx => {
       const fine: types.ShapeOfFine = await PlainFineModel.create({receiverName: 'sihteeri', amount: 10, description: 'sakko.appin laiminlyönti'} as types.ShapeOfPlainFine);
-
+      const user: types.ShapeOfUser = await PlainUserModel.create({ email: 'testo@tmc.fi', username: 'testo', password: 'abcde' } as types.ShapeOfPlainUser);
+      console.log(user)
       return runtime.text(200, `${fine._id} + ${fine.receiverName} + ${fine.amount} + ${fine.description}`);
     }
   }
