@@ -158,6 +158,8 @@ paths:
                 title: User created
                 type: object
                 $ref: '#/components/schemas/User'
+        403:
+          $ref: '#/components/responses/AlreadyExists'
         404:
           $ref: '#/components/responses/NotFound'
   /user/{userId}:
@@ -200,6 +202,25 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /login:
+    post:
+      requestBody:
+        description: User login
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        200:
+          content:
+            text/plain:
+              schema:
+                type: string
+        401:
+          $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
   /test:
@@ -270,9 +291,29 @@ components:
       required:
         - status
         - message
+    UserLogin:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
   responses:
     NotFound:
       description: The specified fine was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    AlreadyExists:
       content:
         application/json:
           schema:

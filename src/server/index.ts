@@ -5,6 +5,7 @@ import * as koaAdapter from '@smartlyio/oats-koa-adapter';
 import * as Koa from 'koa';
 import * as koaBody from 'koa-body';
 import * as mongoose from 'mongoose';
+import * as bcrypt from 'bcryptjs';
 
 import { DB_ADDRESS } from '../config';
 
@@ -77,7 +78,15 @@ const spec: api.Endpoints = {
   },
   '/user': {
     post: async ctx => {
-      const temp_user = await PlainUserModel.create(ctx.body.value as types.ShapeOfPlainUser);
+      const existing_user = await PlainUserModel.findOne({ username: ctx.body.value.username }).exec();
+
+      if (existing_user) {
+        return runtime.json(403, { message: 'username already exists', status: 403 })
+      }
+
+      const encrypted_user = { ...ctx.body.value }
+      encrypted_user.password = bcrypt.hashSync(ctx.body.value.password, 10);
+      const temp_user = await PlainUserModel.create(encrypted_user as types.ShapeOfPlainUser);
       console.log(temp_user)
       if (temp_user) {
         const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
@@ -106,6 +115,19 @@ const spec: api.Endpoints = {
           return {...user.toObject(), _id: user.id} as types.ShapeOfUser
         })
         return runtime.json(200, users);
+      }
+      return runtime.json(404, { message: 'not found', status: 404 });
+    }
+  },
+  '/login': {
+    post: async ctx => {
+      const user = await PlainUserModel.findOne({ username: ctx.body.value.username }).exec();
+      if (user) {
+        if(!bcrypt.compareSync(ctx.body.value.password, user.password)) {
+          return runtime.json(401, { message: 'unauthorized', status: 401 });
+        } else {
+          return runtime.text(200, 'success');
+        }
       }
       return runtime.json(404, { message: 'not found', status: 404 });
     }
