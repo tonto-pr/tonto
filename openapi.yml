@@ -162,6 +162,8 @@ paths:
           $ref: '#/components/responses/AlreadyExists'
         404:
           $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/BadRequest'
   /user/{userId}:
     get:
       tags:
@@ -188,6 +190,24 @@ paths:
                 $ref: '#/components/schemas/User'
         404:
           $ref: '#/components/responses/NotFound'
+    delete:
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          minimum: 1
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/User'
+        404:
+          $ref: '#/components/responses/NotFound'
   /users:
     get:
       tags:
@@ -202,6 +222,94 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /group:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlainGroup'
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Group'
+        403:
+          $ref: '#/components/responses/AlreadyExists'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /group/{groupId}:
+    get:
+      parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: string
+          minimum: 1
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Group'
+        404:
+          $ref: '#/components/responses/NotFound'
+    delete:
+      parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: string
+          minimum: 1
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Group'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /group/{groupId}/members:
+    get:
+      parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: string
+          minimum: 1
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /groups:
+    get:
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
         404:
           $ref: '#/components/responses/NotFound'
   /login:
@@ -223,6 +331,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         404:
           $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/BadRequest'
   /test:
     get:
       tags:
@@ -249,7 +359,6 @@ components:
       required:
         - email
         - username
-        - password
     User:
       allOf:
         - $ref: '#/components/schemas/PlainUser'
@@ -301,6 +410,27 @@ components:
       required:
         - username
         - password
+    PlainGroup:
+        type: object
+        properties:
+          members:
+            type: array
+            items:
+              type: string
+          groupName:
+            type: string
+        required:
+          - groupName
+          - members
+    Group:
+      allOf:
+        - $ref: '#/components/schemas/PlainGroup'
+        - type: object
+          properties:
+            _id:
+              type: string
+          required:
+            - _id
   responses:
     NotFound:
       description: The specified fine was not found
@@ -314,6 +444,11 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
     AlreadyExists:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
       content:
         application/json:
           schema:
