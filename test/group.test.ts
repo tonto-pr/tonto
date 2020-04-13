@@ -5,6 +5,7 @@ import * as mongoose from 'mongoose';
 import { DB_ADDRESS, DB } from '../src/config';
 import { PlainGroupModel, PlainUserModel } from '../src/models';
 import createApp from '../src/server/app';
+import make from './factory';
 
 describe('Group', () => {
   mongoose.connect(DB_ADDRESS, {useNewUrlParser: true, useUnifiedTopology: true, dbName: DB})
@@ -36,21 +37,17 @@ describe('Group', () => {
 
   describe('/group/{groupId}', () => {
     it('gets a group', async () => {
-      const group = await apiClient.group.post({
-        body: runtime.client.json({ members: [] as readonly string[], groupName: 'MJTJP' })
-      });
+      const group = await make('group')
 
-      const gettedgroup = await apiClient.group(group.value.value._id as string).get();
+      const gettedgroup = await apiClient.group(group._id as string).get();
 
-      expect(gettedgroup.value.value._id).toBe(group.value.value._id);
+      expect(gettedgroup.value.value._id).toBe(group._id);
     })
 
     it('removes a group', async () => {
-      const group = await apiClient.group.post({
-        body: runtime.client.json({ members: [] as readonly string[], groupName: 'MJTJP' })
-      });
+      const group = await make('group')
   
-      await apiClient.group(group.value.value._id as string).delete();
+      await apiClient.group(group._id as string).delete();
   
       expect(await PlainGroupModel.estimatedDocumentCount().exec()).toBe(0)
     })
@@ -58,19 +55,12 @@ describe('Group', () => {
   
   describe('/group/{groupId}/members', () => {
       it('lists all members of a group', async () => {
-        const postedUser = await apiClient.user.post({
-          body: runtime.client.json({ email: 'testo@tmc.fi', username: 'testo', password: 'abcd' })
-        });
+        const postedUser = await make('user')
+        const postedUser2 = await make('user', { username: 'testo2' })
 
-        const postedUser2 = await apiClient.user.post({
-          body: runtime.client.json({ email: 'testo@tmc.fi', username: 'testo2', password: 'abcd' })
-        });
+        const group = await make('group', { members: [postedUser._id, postedUser2._id]})
 
-        const group = await apiClient.group.post({
-          body: runtime.client.json({ members: [postedUser.value.value._id, postedUser2.value.value._id] as readonly string[], groupName: 'MJTJP' })
-        });
-
-        const groupMembers = await apiClient.group(group.value.value._id as string).members.get();
+        const groupMembers = await apiClient.group(group._id as string).members.get();
 
         expect(groupMembers.value.value.length).toBe(2);
       })
@@ -78,16 +68,10 @@ describe('Group', () => {
 
   describe('/groups', () => {
     it('lists all groups', async () => {
-      await apiClient.group.post({
-        body: runtime.client.json({ members: [] as readonly string[], groupName: 'MJTJP1' })
-      });
-      await apiClient.group.post({
-        body: runtime.client.json({ members: [] as readonly string[], groupName: 'MJTJP2' })
-      });
-      await apiClient.group.post({
-        body: runtime.client.json({ members: [] as readonly string[], groupName: 'MJTJP3' })
-      });
-  
+      await make('group')
+      await make('group', { groupName: 'MJTJP2' })
+      await make('group', { groupName: 'MJTJP3' })
+
       const groups = await apiClient.groups.get();
 
       expect(groups.value.value.length).toBe(3);
