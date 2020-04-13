@@ -10,7 +10,7 @@ services:
     ports:
     - "3000:3000"
     depends_on:
-    - mongo
-  mongo:
+    - mongo_test
+  mongo_test:
     image: mongo
     command: mongod --port 27016
