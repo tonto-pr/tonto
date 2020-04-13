@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { injectProps } from '../src/server/injector';
+import { injectProps } from '../src/injector';
 
 interface PropertyDetail {
     name: string,
