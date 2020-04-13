@@ -11,8 +11,8 @@ describe('Fine', () => {
       .then(async (m) => console.log('Successfully connected to mongodb'))
       .catch(async (err) => console.error(err));
 
-  const server = createApp();
-  server.listen(3000);
+  const app = createApp();
+  const server = app.listen(3000);
   const apiClient = api.client(axiosAdapter.bind);
 
   afterEach(async () => {
@@ -20,6 +20,7 @@ describe('Fine', () => {
   })
   afterAll(() => {
     mongoose.connection.close();
+    server.close();
   })
 
   describe('/fine', () => {    
