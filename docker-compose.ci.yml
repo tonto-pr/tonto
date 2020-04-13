@@ -1,7 +1,17 @@
 version: '3'
 services:
   test:
-    build: .
+    environment:
+      - NODE_ENV=test
+    build: 
+      context: .
+      dockerfile: Dockerfile.test
+    command: yarn test
     ports:
     - "3000:3000"
-    command: ['yarn', 'test']
+    depends_on:
+    - mongo
+  mongo:
+    image: mongo
+    ports:
+    - "27017:27017"

@@ -8,6 +8,9 @@ switch (process.env.NODE_ENV) {
   case "development":
     path = `${__dirname}/../.env.development`;
     break;
+  case "test":
+    path = `${__dirname}/../.env.test`;
+    break;
   default:
     path = `${__dirname}/../.env`;
 }
@@ -22,3 +25,4 @@ function fromEnv(variable: string) {
 }
 
 export const DB_ADDRESS: string = fromEnv('DB_ADDRESS');
+export const DB: string = fromEnv('DB');
