@@ -5,6 +5,7 @@ import * as mongoose from 'mongoose';
 import { DB_ADDRESS, DB } from '../src/config';
 import { PlainFineModel } from '../src/models';
 import createApp from '../src/server/app';
+import make from './factory';
 
 describe('Fine', () => {
   mongoose.connect(DB_ADDRESS, {useNewUrlParser: true, useUnifiedTopology: true, dbName: DB})
@@ -35,21 +36,17 @@ describe('Fine', () => {
 
   describe('/fine/{fineId}', () => {
     it('gets a fine', async () => {
-      const fine = await apiClient.fine.post({
-        body: runtime.client.json({ receiverName: 'testo', amount: 1000, description: 'sakko.appin kehitys' })
-      });
+      const fine = await make('fine')
 
-      const gettedFine = await apiClient.fine(fine.value.value._id as string).get();
+      const gettedFine = await apiClient.fine(fine._id as string).get();
 
-      expect(gettedFine.value.value._id).toBe(fine.value.value._id);
+      expect(gettedFine.value.value._id).toBe(fine._id);
     })
 
     it('updates a fine', async () => {
-      const fine = await apiClient.fine.post({
-        body: runtime.client.json({ receiverName: 'testo', amount: 1000, description: 'sakko.appin kehitys' })
-      });
+      const fine = await make('fine')
 
-      const gettedFine = await apiClient.fine(fine.value.value._id as string).put({
+      const gettedFine = await apiClient.fine(fine._id as string).put({
         body: runtime.client.json({ receiverName: 'testo2', amount: 1000, description: 'sakko.appin kehitys' })
       });
 
@@ -57,11 +54,9 @@ describe('Fine', () => {
     })
 
     it('removes a fine', async () => {
-      const fine = await apiClient.fine.post({
-        body: runtime.client.json({ receiverName: 'testo', amount: 1000, description: 'sakko.appin kehitys' })
-      });
+      const fine = await make('fine')
   
-      await apiClient.fine(fine.value.value._id as string).delete();
+      await apiClient.fine(fine._id as string).delete();
   
       expect(await PlainFineModel.estimatedDocumentCount().exec()).toBe(0)
     })
@@ -69,15 +64,9 @@ describe('Fine', () => {
   
   describe('/fines', () => {
     it('lists all fines', async () => {
-      await apiClient.fine.post({
-        body: runtime.client.json({ receiverName: 'testo1', amount: 1000, description: 'sakko.appin kehitys' })
-      });
-      await apiClient.fine.post({
-        body: runtime.client.json({ receiverName: 'testo2', amount: 1000, description: 'sakko.appin kehitys' })
-      });
-      await apiClient.fine.post({
-        body: runtime.client.json({ receiverName: 'testo3', amount: 1000, description: 'sakko.appin kehitys' })
-      });
+      await make('fine')
+      await make('fine', { receiverName: 'testo2' })
+      await make('fine', { receiverName: 'testo3' })
   
       const fines = await apiClient.fines.get();
 
