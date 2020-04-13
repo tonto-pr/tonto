@@ -14,7 +14,7 @@
     "dev": "./node_modules/nodemon/bin/nodemon.js",
     "encrypt": "sops --input-type dotenv -e -i .env",
     "decrypt": "sops --input-type dotenv -d -i .env",
-    "test": "jest"
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "@smartlyio/oats": "1.7.1",
