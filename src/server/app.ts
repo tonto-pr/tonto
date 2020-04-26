@@ -80,7 +80,10 @@ const spec: api.Endpoints = {
       const temp_user = await PlainUserModel.create(encrypted_user as types.ShapeOfPlainUser);
       console.log(temp_user)
       if (temp_user) {
-        const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
+        const userObject = temp_user.toObject();
+        delete userObject.password
+        
+        const user: types.ShapeOfUser = {...userObject, _id: temp_user.id}
         return runtime.json(200, user);
       }
       return runtime.json(404, { message: 'not found', status: 404 })
