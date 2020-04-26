@@ -5,6 +5,7 @@ import * as koaAdapter from '@smartlyio/oats-koa-adapter';
 import * as Koa from 'koa';
 import * as koaBody from 'koa-body';
 import * as bcrypt from 'bcryptjs';
+import * as cors from '@koa/cors';
 
 import { PlainFineModel, PlainUserModel, PlainGroupModel } from '../models';
 
@@ -226,6 +227,11 @@ const routes = koaAdapter.bind(api.router, spec);
 const createApp = (): Koa => {
   const app = new Koa();
 
+  const corsOptions = {
+    origin: '*'
+  };
+
+  app.use(cors(corsOptions));
   app.use(koaBody({ multipart: true }));
   app.use(routes.routes());
   console.log("Starting server");
