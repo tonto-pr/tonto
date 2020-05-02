@@ -324,9 +324,9 @@ paths:
       responses:
         200:
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/User'
         401:
           $ref: '#/components/responses/Unauthorized'
         404:
@@ -356,6 +356,8 @@ components:
           type: string
         password:
           type: string
+        accessToken:
+              type: string
       required:
         - email
         - username
@@ -407,9 +409,8 @@ components:
           type: string
         password:
           type: string
-      required:
-        - username
-        - password
+        accessToken:
+          type: string
     PlainGroup:
         type: object
         properties:
