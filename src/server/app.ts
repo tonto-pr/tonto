@@ -6,6 +6,7 @@ import * as Koa from 'koa';
 import * as koaBody from 'koa-body';
 import * as bcrypt from 'bcryptjs';
 import * as cors from '@koa/cors';
+import * as cryptoRandom from 'crypto-random-string';
 
 import { PlainFineModel, PlainUserModel, PlainGroupModel } from '../models';
 
@@ -76,7 +77,9 @@ const spec: api.Endpoints = {
       }
 
       const encrypted_user = { ...ctx.body.value }
+      console.log(encrypted_user)
       encrypted_user.password = bcrypt.hashSync(ctx.body.value.password, 10);
+      encrypted_user.accessToken = cryptoRandom({length: 30});
       const temp_user = await PlainUserModel.create(encrypted_user as types.ShapeOfPlainUser);
       console.log(temp_user)
       if (temp_user) {
@@ -91,7 +94,7 @@ const spec: api.Endpoints = {
   },
   '/user/{userId}': {
     delete: async ctx => {
-      const temp_user = await PlainUserModel.findOneAndDelete({ _id: ctx.params.userId });
+      const temp_user = await PlainUserModel.findOneAndDelete({ _id: ctx.params.userId }).exec();
 
       if (temp_user) {
         const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
@@ -100,7 +103,7 @@ const spec: api.Endpoints = {
       return runtime.json(404, { message: 'not found', status: 404 });
     },
     get: async ctx => {
-      let temp_user = await PlainUserModel.findById(ctx.params.userId).select("-password").exec();
+      let temp_user = await PlainUserModel.findById(ctx.params.userId).select("-password -accessToken").exec();
 
       if (temp_user) {
         const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
@@ -111,7 +114,7 @@ const spec: api.Endpoints = {
   },
   '/users': {
     get: async ctx => {
-      const temp_users = await PlainUserModel.find({}).select("-password").exec();
+      const temp_users = await PlainUserModel.find({}).select("-password -accessToken").exec();
 
       if (temp_users) {
         const users = temp_users.map((temp_user: any) => {
@@ -201,15 +204,26 @@ const spec: api.Endpoints = {
   },
   '/login': {
     post: async ctx => {
-      const user = await PlainUserModel.findOne({ username: ctx.body.value.username }).exec();
+      if (ctx.body.value.accessToken) {
+        const user = await PlainUserModel.findOne({ accessToken: ctx.body.value.accessToken }).select("-password").exec();
+        if (user) {
+          const finalUser: types.ShapeOfUser = {...user.toObject(), _id: user.id}
+          return runtime.json(200, finalUser)
+        }
+      }
+
+      const user = await PlainUserModel.findOneAndUpdate({ username: ctx.body.value.username }, { accessToken: cryptoRandom({length: 30}) }, { new: true });
+      
       if (user) {
-        if (!user.password) {
+        if (!ctx.body.value.password) {
           return runtime.json(500, { message: 'please provide a password', status: 500 });
         }
-        if(!bcrypt.compareSync(ctx.body.value.password, user.password)) {
+        if(user.password && !bcrypt.compareSync(ctx.body.value.password, user.password)) {
           return runtime.json(401, { message: 'unauthorized', status: 401 });
         } else {
-          return runtime.text(200, 'success');
+          const finalUser: types.ShapeOfUser = {...user.toObject(), _id: user.id}
+          console.log(finalUser)
+          return runtime.json(200, finalUser);
         }
       }
       return runtime.json(404, { message: 'not found', status: 404 });

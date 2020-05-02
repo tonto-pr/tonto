@@ -7,6 +7,8 @@ mongoose.connect(DB_ADDRESS, {useNewUrlParser: true, useUnifiedTopology: true, d
   .then((m) => console.log('Successfully connected to mongodb'))
   .catch((err) => console.error(err));
 
+mongoose.set('useFindAndModify', false);
+
 const server = createApp();
 
 server.listen(3000);
