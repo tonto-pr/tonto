@@ -12,17 +12,10 @@ pipeline {
                 }
             }
         }
-        stage('Build test images') {
-            steps {
-                script {
-                    sh 'docker-compose -f docker-compose.ci.yml build test'
-                }
-            }
-        }
         stage('Run tests') {
             steps {
                 script {
-                    sh 'docker-compose -f docker-compose.ci.yml run test'
+                    sh 'docker-compose -f docker-compose.ci.yml up --abort-on-container-exit'
                 }
             }
         }
