@@ -1,28 +1,17 @@
-import * as dotenv from 'dotenv';
+const variables = require('../secrets/decrypted/variables.json')
 
-let path;
-switch (process.env.NODE_ENV) {
-  case "production":
-    path = `${__dirname}/../.env`;
-    break;
-  case "development":
-    path = `${__dirname}/../.env.development`;
-    break;
-  case "test":
-    path = `${__dirname}/../.env.test`;
-    break;
-  default:
-    path = `${__dirname}/../.env`;
+interface Config {
+  [key: string]: string
 }
 
-dotenv.config({ path: path });
+const config: Config = variables[process.env.NODE_ENV || 'development']
 
 function fromEnv(variable: string) {
-    const processVariable = process.env[variable];
-    if (processVariable) return processVariable;
+  const processVariable = config[variable];
+  if (processVariable) return processVariable;
 
-    return "";
+  return "";
 }
 
-export const DB_ADDRESS: string = fromEnv('DB_ADDRESS');
 export const DB: string = fromEnv('DB');
+export const DB_ADDRESS: string = fromEnv('DB_ADDRESS');

@@ -8,7 +8,7 @@ pipeline {
         stage('Decrypt secrets') {
             steps {
                 script {
-                    sh 'sops --input-type dotenv -d -i .env'
+                    sh 'sops -d --output-type json ./secrets/encrypted/variables.json > ./secrets/decrypted/variables.json'
                 }
             }
         }
