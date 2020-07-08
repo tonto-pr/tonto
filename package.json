@@ -7,14 +7,14 @@
   "author": "Anton Rautio <anton.rautio@smartly.io>",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node src/server/index.ts",
+    "start": "NODE_ENV=production ts-node src/server/index.ts",
     "start-client": "ts-node src/client/client.ts",
     "generate": "rm -rf generated/ && mkdir generated && ts-node generator.ts",
     "tsc": "tsc",
-    "dev": "./node_modules/nodemon/bin/nodemon.js",
-    "encrypt": "sops --input-type dotenv -e -i .env",
-    "decrypt": "sops --input-type dotenv -d -i .env",
-    "test": "jest --runInBand"
+    "dev": "NODE_ENV=development ./node_modules/nodemon/bin/nodemon.js",
+    "encrypt": "sops -e --input-type json ./secrets/decrypted/variables.json > ./secrets/encrypted/variables.json",
+    "decrypt": "sops -d --output-type json ./secrets/encrypted/variables.json > ./secrets/decrypted/variables.json",
+    "test": "NODE_ENV=test jest --runInBand"
   },
   "dependencies": {
     "@koa/cors": "^3.0.0",

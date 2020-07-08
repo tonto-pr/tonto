@@ -1,8 +1,7 @@
 version: '3'
 services:
   web:
-    build: .
-    image: antoinert/tonto:latest
+    image: antoinert/tonto:action-latest
     ports:
     - "3000:3000"
     depends_on:
