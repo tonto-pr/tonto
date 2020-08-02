@@ -1,16 +1,16 @@
 import createApp from './app';
-import * as mongoose from 'mongoose';
+// import * as mongoose from 'mongoose';
 
-import { DB_ADDRESS, DB } from '../config';
+// binding all Objection.js models to knex. Enables querying etc.
 
-console.log("DB_ADDRESS, ", DB_ADDRESS)
-console.log("DB, ", DB)
-console.log(process.env.NODE_ENV)
-mongoose.connect(DB_ADDRESS, {useNewUrlParser: true, useUnifiedTopology: true, dbName: DB})
-  .then((m) => console.log('Successfully connected to mongodb'))
-  .catch((err) => console.error(err));
+// import { DB_ADDRESS, DB } from '../config';
 
-mongoose.set('useFindAndModify', false);
+
+// mongoose.connect(DB_ADDRESS, {useNewUrlParser: true, useUnifiedTopology: true, dbName: DB})
+//   .then((m) => console.log('Successfully connected to mongodb'))
+//   .catch((err) => console.error(err));
+
+// mongoose.set('useFindAndModify', false);
 
 const server = createApp();
 

@@ -15,3 +15,5 @@ function fromEnv(variable: string) {
 
 export const DB: string = fromEnv('DB');
 export const DB_ADDRESS: string = fromEnv('DB_ADDRESS');
+export const POSTGRES_URL: string = fromEnv('POSTGRES_URL');
+export const POSTGRES_DB: string = fromEnv('POSTGRES_DB');

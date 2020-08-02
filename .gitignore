@@ -1,2 +1,4 @@
 /node_modules
 *.generated.ts
+yarn-error.log
+secrets/decrypted

@@ -8,57 +8,53 @@ import * as bcrypt from 'bcryptjs';
 import * as cors from '@koa/cors';
 import * as cryptoRandom from 'crypto-random-string';
 
-import { PlainFineModel, PlainUserModel, PlainGroupModel } from '../models';
+import { knex } from '../../db/database';
 
 const spec: api.Endpoints = {
   '/fine': {
     post: async ctx => {
-      const temp_fine = await PlainFineModel.create(ctx.body.value as types.ShapeOfPlainFine);
+      if (ctx.body.value.amount > 2000000000) {
+        return runtime.json(500, { message: 'Amount is too large. Please submit an amount less than 2 Billion.', status: 500})
+      }
+      const fines: types.ShapeOfFine[] = await knex('dim_fines').returning('*').insert(ctx.body.value as types.ShapeOfPlainFine)
 
-      if (temp_fine) {
-        const fine: types.ShapeOfFine = {...temp_fine.toObject(), _id: temp_fine.id}
-        return runtime.json(200, fine);
+      if (fines.length > 0) {
+        return runtime.json(200, fines[0]);
       }
       return runtime.json(404, { message: 'not found', status: 404 })
     }
   },
-  '/fine/{fineId}': {
+  '/fine/{fine_id}': {
     delete: async ctx => {
-      const temp_fine = await PlainFineModel.findOneAndDelete({ _id: ctx.params.fineId });
+      const fines: types.ShapeOfFine[] = await knex('dim_fines').where({ fine_id: parseInt(ctx.params.fine_id)}).returning('*').del()
 
-      if (temp_fine) {
-        const fine: types.ShapeOfFine = {...temp_fine.toObject(), _id: temp_fine.id}
-        return runtime.json(200, fine);
+      if (fines.length > 0) {
+        return runtime.json(200, fines[0]);
       }
       return runtime.json(404, { message: 'not found', status: 404 });
     },
     get: async ctx => {
-      let temp_fine = await PlainFineModel.findById(ctx.params.fineId).exec();
-
-      if (temp_fine) {
-        const fine: types.ShapeOfFine = {...temp_fine.toObject(), _id: temp_fine.id}
-        return runtime.json(200, fine);
+      const fines: types.ShapeOfFine[] = await knex('dim_fines').select('*').where({ fine_id: parseInt(ctx.params.fine_id)})
+      
+      if (fines.length > 0) {
+        return runtime.json(200, fines[0]);
       }
       return runtime.json(404, { message: 'not found', status: 404 });
     },
     put: async ctx => {
-      const temp_fine = await PlainFineModel.findOneAndUpdate({ _id: ctx.params.fineId }, ctx.body.value, { upsert: true, new: true }).exec();
+      const fines: types.ShapeOfFine[] = await knex('dim_fines').where({ fine_id: ctx.params.fine_id}).returning('*').update(ctx.body.value as types.ShapeOfPlainFine)
 
-      if (temp_fine) {
-        const fine: types.ShapeOfFine = {...temp_fine.toObject(), _id: temp_fine.id}
-        return runtime.json(200, fine);
+      if (fines.length > 0) {
+        return runtime.json(200, fines[0]);
       }
       return runtime.json(404, { message: 'not found', status: 404 });
     }
   },
   '/fines': {
     get: async ctx => {
-      const temp_fines = await PlainFineModel.find({}).exec();
+      const fines: types.ShapeOfFine[] = await knex('dim_fines').select('*');
 
-      if (temp_fines) {
-        const fines = temp_fines.map((fine: any) => {
-          return {...fine.toObject(), _id: fine.id} as types.ShapeOfFine
-        })
+      if (fines) {
         return runtime.json(200, fines);
       }
       return runtime.json(404, { message: 'not found', status: 404 });
@@ -66,9 +62,9 @@ const spec: api.Endpoints = {
   },
   '/user': {
     post: async ctx => {
-      const existing_user = await PlainUserModel.findOne({ username: ctx.body.value.username }).exec();
+      const existing_user: types.ShapeOfUser[] = await knex('dim_users').select('*').where({ username: ctx.body.value.username })
 
-      if (existing_user) {
+      if (existing_user.length > 0) {
         return runtime.json(403, { message: 'username already exists', status: 403 })
       }
 
@@ -77,164 +73,156 @@ const spec: api.Endpoints = {
       }
 
       const encrypted_user = { ...ctx.body.value }
-      console.log(encrypted_user)
+
       encrypted_user.password = bcrypt.hashSync(ctx.body.value.password, 10);
-      encrypted_user.accessToken = cryptoRandom({length: 30});
-      const temp_user = await PlainUserModel.create(encrypted_user as types.ShapeOfPlainUser);
-      console.log(temp_user)
-      if (temp_user) {
-        const userObject = temp_user.toObject();
-        delete userObject.password
-        
-        const user: types.ShapeOfUser = {...userObject, _id: temp_user.id}
-        return runtime.json(200, user);
+      encrypted_user.access_token = cryptoRandom({length: 30});
+      const users: types.ShapeOfUser[] = await knex('dim_users').returning(['user_id', 'username', 'access_token', 'email']).insert(encrypted_user as types.ShapeOfPlainUser)
+      if (users.length > 0) {        
+        return runtime.json(200, users[0]);
       }
       return runtime.json(404, { message: 'not found', status: 404 })
     }
   },
-  '/user/{userId}': {
+  '/user/{user_id}': {
     delete: async ctx => {
-      const temp_user = await PlainUserModel.findOneAndDelete({ _id: ctx.params.userId }).exec();
+      const users: types.ShapeOfUser[] = await knex('dim_users').where({ user_id: parseInt(ctx.params.user_id) }).returning(['user_id', 'username', 'email']).del()
 
-      if (temp_user) {
-        const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
-        return runtime.json(200, user);
+      if (users.length > 0) {
+        return runtime.json(200, users[0]);
       }
       return runtime.json(404, { message: 'not found', status: 404 });
     },
     get: async ctx => {
-      let temp_user = await PlainUserModel.findById(ctx.params.userId).select("-password -accessToken").exec();
+      const users: types.ShapeOfUser[] = await knex('dim_users').select(['user_id', 'username', 'email']).where({ user_id: parseInt(ctx.params.user_id) })
 
-      if (temp_user) {
-        const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
-        return runtime.json(200, user);
+      if (users.length > 0) {
+        return runtime.json(200, users[0]);
       }
       return runtime.json(404, { message: 'not found', status: 404 });
     }
   },
   '/users': {
     get: async ctx => {
-      const temp_users = await PlainUserModel.find({}).select("-password -accessToken").exec();
-
-      if (temp_users) {
-        const users = temp_users.map((temp_user: any) => {
-          const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
-          return user
-        })
+      const users: types.ShapeOfUser[] = await knex('dim_users').select(['user_id', 'username', 'email']);
+      
+      if (users.length > 0) {
         return runtime.json(200, users);
       }
       return runtime.json(404, { message: 'not found', status: 404 });
     }
   },
-  '/group': {
-    post: async ctx => {
-      const groupBody = { ...ctx.body.value };
+  // '/group': {
+  //   post: async ctx => {
+  //     const groupBody = { ...ctx.body.value };
 
-      if (!groupBody.members) {
-        groupBody.members = []
-      }
+  //     if (!groupBody.members) {
+  //       groupBody.members = []
+  //     }
 
-      const existing_group = await PlainGroupModel.findOne({ groupName: ctx.body.value.groupName }).exec();
+  //     const existing_group = await PlainGroupModel.findOne({ groupName: ctx.body.value.groupName }).exec();
 
-      if (existing_group) {
-        return runtime.json(403, { message: 'group name already exists', status: 403 })
-      }
+  //     if (existing_group) {
+  //       return runtime.json(403, { message: 'group name already exists', status: 403 })
+  //     }
 
-      const temp_group = await PlainGroupModel.create(groupBody as types.ShapeOfPlainGroup);
+  //     const temp_group = await PlainGroupModel.create(groupBody as types.ShapeOfPlainGroup);
 
-      if (temp_group) {
-        const group: types.ShapeOfGroup = {...temp_group.toObject(), _id: temp_group.id}
-        return runtime.json(200, group);
-      }
-      return runtime.json(404, { message: 'not found', status: 404 })
-    }
-  },
-  '/group/{groupId}': {
-    delete: async ctx => {
-      const temp_group = await PlainGroupModel.findOneAndDelete({ _id: ctx.params.groupId });
+  //     if (temp_group) {
+  //       const group: types.ShapeOfGroup = {...temp_group.toObject(), _id: temp_group.id}
+  //       return runtime.json(200, group);
+  //     }
+  //     return runtime.json(404, { message: 'not found', status: 404 })
+  //   }
+  // },
+  // '/group/{groupId}': {
+  //   delete: async ctx => {
+  //     const temp_group = await PlainGroupModel.findOneAndDelete({ _id: ctx.params.groupId });
 
-      if (temp_group) {
-        const group: types.ShapeOfGroup = {...temp_group.toObject(), _id: temp_group.id}
-        return runtime.json(200, group);
-      }
-      return runtime.json(404, { message: 'not found', status: 404 });
-    },
-    get: async ctx => {
-      let temp_group = await PlainGroupModel.findById(ctx.params.groupId).exec();
+  //     if (temp_group) {
+  //       const group: types.ShapeOfGroup = {...temp_group.toObject(), _id: temp_group.id}
+  //       return runtime.json(200, group);
+  //     }
+  //     return runtime.json(404, { message: 'not found', status: 404 });
+  //   },
+  //   get: async ctx => {
+  //     let temp_group = await PlainGroupModel.findById(ctx.params.groupId).exec();
 
-      if (temp_group) {
-        const group: types.ShapeOfGroup = {...temp_group.toObject(), _id: temp_group.id}
-        return runtime.json(200, group);
-      }
-      return runtime.json(404, { message: 'not found', status: 404 });
-    }
-  },
-  '/group/{groupId}/members': {
-    get: async ctx => {
-      let temp_group = await PlainGroupModel.findById(ctx.params.groupId).exec();
+  //     if (temp_group) {
+  //       const group: types.ShapeOfGroup = {...temp_group.toObject(), _id: temp_group.id}
+  //       return runtime.json(200, group);
+  //     }
+  //     return runtime.json(404, { message: 'not found', status: 404 });
+  //   }
+  // },
+  // '/group/{groupId}/members': {
+  //   get: async ctx => {
+  //     let temp_group = await PlainGroupModel.findById(ctx.params.groupId).exec();
 
-      if (!temp_group) {
-        return runtime.json(404, { message: 'not found', status: 404 });
-      }
+  //     if (!temp_group) {
+  //       return runtime.json(404, { message: 'not found', status: 404 });
+  //     }
 
-      const groupMembers = await PlainUserModel.find({_id: { $in: temp_group.members }}).select('-password').exec();
+  //     const groupMembers = await PlainUserModel.find({_id: { $in: temp_group.members }}).select('-password').exec();
 
-      if (groupMembers) {
-        const users = groupMembers.map((temp_user: any) => {
-          const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
-          return user
-        })
-        return runtime.json(200, users);
-      }
-      return runtime.json(404, { message: 'not found', status: 404 });
-    }
-  },
-  '/groups': {
-    get: async ctx => {
-      const temp_groups = await PlainGroupModel.find({});
+  //     if (groupMembers) {
+  //       const users = groupMembers.map((temp_user: any) => {
+  //         const user: types.ShapeOfUser = {...temp_user.toObject(), _id: temp_user.id}
+  //         return user
+  //       })
+  //       return runtime.json(200, users);
+  //     }
+  //     return runtime.json(404, { message: 'not found', status: 404 });
+  //   }
+  // },
+  // '/groups': {
+  //   get: async ctx => {
+  //     const temp_groups = await PlainGroupModel.find({});
 
-      if (temp_groups) {
-        const groups = temp_groups.map((group: any) => {
-          return {...group.toObject(), _id: group.id} as types.ShapeOfGroup
-        })
-        return runtime.json(200, groups);
-      }
-      return runtime.json(404, { message: 'not found', status: 404 });
-    }
-  },
+  //     if (temp_groups) {
+  //       const groups = temp_groups.map((group: any) => {
+  //         return {...group.toObject(), _id: group.id} as types.ShapeOfGroup
+  //       })
+  //       return runtime.json(200, groups);
+  //     }
+  //     return runtime.json(404, { message: 'not found', status: 404 });
+  //   }
+  // },
   '/login': {
     post: async ctx => {
-      if (ctx.body.value.accessToken) {
-        const user = await PlainUserModel.findOne({ accessToken: ctx.body.value.accessToken }).select("-password").exec();
-        if (user) {
-          const finalUser: types.ShapeOfUser = {...user.toObject(), _id: user.id}
-          return runtime.json(200, finalUser)
+      if (ctx.body.value.access_token) {
+        const users: types.ShapeOfUser[] = await knex('dim_users').select(['user_id', 'username', 'email']).where({ access_token: ctx.body.value.access_token })
+
+        if (users.length === 1) {
+          return runtime.json(200, users[0])
         }
       }
 
-      const user = await PlainUserModel.findOneAndUpdate({ username: ctx.body.value.username }, { accessToken: cryptoRandom({length: 30}) }, { new: true });
-      
-      if (user) {
+      const users: types.ShapeOfUser[] = await knex('dim_users').where({ username: ctx.body.value.username }).returning(['user_id', 'username', 'email', 'password']).update({ access_token: cryptoRandom({length: 30}) })
+
+      if (users.length === 1) {
+        const { password, ...user } = users[0]
         if (!ctx.body.value.password) {
           return runtime.json(500, { message: 'please provide a password', status: 500 });
         }
-        if(user.password && !bcrypt.compareSync(ctx.body.value.password, user.password)) {
+        if(password && !bcrypt.compareSync(ctx.body.value.password, password)) {
           return runtime.json(401, { message: 'unauthorized', status: 401 });
         } else {
-          const finalUser: types.ShapeOfUser = {...user.toObject(), _id: user.id}
-          console.log(finalUser)
-          return runtime.json(200, finalUser);
+          return runtime.json(200, user);
         }
+      } else if (users.length > 1) {
+        console.log('Duplicate users found');
       }
       return runtime.json(404, { message: 'not found', status: 404 });
     }
   },
   '/test': {
     get: async ctx => {
-      const fine: types.ShapeOfFine = await PlainFineModel.create({receiverName: 'sihteeri', amount: 10, description: 'sakko.appin laiminlyönti'} as types.ShapeOfPlainFine);
-      const user: types.ShapeOfUser = await PlainUserModel.create({ email: 'testo@tmc.fi', username: 'testo', password: 'abcde' } as types.ShapeOfPlainUser);
+      const fines: types.ShapeOfFine[] = await knex('dim_fines').returning('*').insert({amount: 10, description: 'sakko.appin laiminlyönti'} as types.ShapeOfPlainFine)
+      const users: types.ShapeOfUser[] = await knex('dim_users').returning(['user_id', 'username', 'email']).insert({ email: 'testo@tmc.fi', username: 'testo', password: 'abcde' } as types.ShapeOfPlainUser)
+      const fine = fines[0]
+      const user = users[0]
       console.log(user)
-      return runtime.text(200, `${fine._id} + ${fine.receiverName} + ${fine.amount} + ${fine.description}`);
+      return runtime.text(200, `${fine.fine_id} + ${fine.amount} + ${fine.description}`);
     }
   }
 };

@@ -1,16 +1,25 @@
-version: '3'
+version: '2.3'
+
 services:
   test:
-    environment:
-      - NODE_ENV=test
     build: 
       context: .
       dockerfile: Dockerfile.test
-    command: yarn test
+    command: bash -c "yarn db:ci:setup && yarn test"
     ports:
     - "3001:3001"
     depends_on:
-    - mongo_test
+      postgres_test:
+        condition: service_healthy
+  postgres_test:
+    image: postgres:12.2-alpine
+    environment:
+      POSTGRES_DB: "tonto_test"
+      POSTGRES_USER: "tonto"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    healthcheck:
+      test: "pg_isready -U tonto -d tonto_test"
+      interval: 5s
   mongo_test:
     image: mongo
     command: mongod --port 27016
