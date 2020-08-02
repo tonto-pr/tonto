@@ -6,7 +6,7 @@ services:
     ports:
     - "3000:3000"
     depends_on:
-        postgres_test:
+        postgres:
           condition: service_healthy
   postgres:
     image: postgres:12.2-alpine
