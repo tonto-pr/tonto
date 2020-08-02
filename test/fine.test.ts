@@ -1,72 +1,67 @@
 import * as api from '../generated/client.generated';
 import * as axiosAdapter from '@smartlyio/oats-axios-adapter';
 import * as runtime from '@smartlyio/oats-runtime';
-import * as mongoose from 'mongoose';
-import { DB_ADDRESS, DB } from '../src/config';
-import { PlainFineModel } from '../src/models';
 import createApp from '../src/server/app';
-import make from './factory';
+import { makeFine } from './factory';
+
+import { knex } from '../db/database';
 
 describe('Fine', () => {
-  mongoose.connect(DB_ADDRESS, {useNewUrlParser: true, useUnifiedTopology: true, dbName: DB})
-      .then(async (m) => console.log('Successfully connected to mongodb'))
-      .catch(async (err) => console.error(err));
-
   const app = createApp();
   const server = app.listen(3000);
   const apiClient = api.client(axiosAdapter.bind);
 
   afterEach(async () => {
-    await PlainFineModel.deleteMany({}).exec()
+    await knex('dim_fines').del()
   })
-  afterAll(() => {
-    mongoose.connection.close();
+  afterAll(async () => {
+    await knex.destroy()
     server.close();
   })
 
   describe('/fine', () => {    
     it('creates a fine', async () => {
       await apiClient.fine.post({
-        body: runtime.client.json({ receiverName: 'testo', amount: 1000, description: 'sakko.appin kehitys' })
+        body: runtime.client.json({ amount: 1000, description: 'sakko.appin kehitys' })
       });
-  
-      expect(await PlainFineModel.estimatedDocumentCount().exec()).toBe(1)
+      const count = parseInt((await knex('dim_fines').count())[0].count as string)
+      expect(count).toBe(1)
     })
   })
 
   describe('/fine/{fineId}', () => {
     it('gets a fine', async () => {
-      const fine = await make('fine')
+      const fine = await makeFine()
 
-      const gettedFine = await apiClient.fine(fine._id as string).get();
+      const gettedFine = await apiClient.fine(fine.fine_id.toString()).get();
 
-      expect(gettedFine.value.value._id).toBe(fine._id);
+      expect(gettedFine.value.value.fine_id).toBe(fine.fine_id);
     })
 
     it('updates a fine', async () => {
-      const fine = await make('fine')
+      const fine = await makeFine()
 
-      const gettedFine = await apiClient.fine(fine._id as string).put({
-        body: runtime.client.json({ receiverName: 'testo2', amount: 1000, description: 'sakko.appin kehitys' })
+      const gettedFine = await apiClient.fine(fine.fine_id.toString()).put({
+        body: runtime.client.json({ amount: 1000, description: 'sakko.appin kehitys viivästyy' })
       });
 
-      expect(gettedFine.value.value.receiverName).toBe('testo2');
+      expect(gettedFine.value.value.description).toBe('sakko.appin kehitys viivästyy');
     })
 
     it('removes a fine', async () => {
-      const fine = await make('fine')
+      const fine = await makeFine()
   
-      await apiClient.fine(fine._id as string).delete();
-  
-      expect(await PlainFineModel.estimatedDocumentCount().exec()).toBe(0)
+      await apiClient.fine(fine.fine_id.toString()).delete();
+      const count = parseInt((await knex('dim_fines').count())[0].count as string)
+      expect(count).toBe(0)
     })
   })
   
   describe('/fines', () => {
     it('lists all fines', async () => {
-      await make('fine')
-      await make('fine', { receiverName: 'testo2' })
-      await make('fine', { receiverName: 'testo3' })
+      await makeFine()
+      await makeFine({ description: 'testo2' })
+      await makeFine({ description: 'testo3' })
   
       const fines = await apiClient.fines.get();
 
