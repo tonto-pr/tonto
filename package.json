@@ -17,7 +17,8 @@
     "decrypt": "sops -d --output-type json ./secrets/encrypted/variables.json > ./secrets/decrypted/variables.json",
     "test": "NODE_ENV=test jest --runInBand",
     "db:setup": "NODE_ENV=development ts-node ./db/setupDB.ts",
-    "db:ci:setup": "NODE_ENV=test ts-node ./db/setupDB.ts"
+    "db:ci:setup": "NODE_ENV=test ts-node ./db/setupDB.ts",
+    "db:production:setup": "NODE_ENV=production ts-node ./db/setupDB.ts"
   },
   "dependencies": {
     "@koa/cors": "^3.0.0",
