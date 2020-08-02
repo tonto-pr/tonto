@@ -20,6 +20,3 @@ services:
     healthcheck:
       test: "pg_isready -U tonto -d tonto_test"
       interval: 5s
-  mongo_test:
-    image: mongo
-    command: mongod --port 27016
