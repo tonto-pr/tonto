@@ -3,7 +3,6 @@ version: '2.3'
 services:
   web:
     image: antoinert/tonto:action-latest
-    command: bash -c "yarn db:ci:setup && yarn start"
     ports:
     - "3000:3000"
     depends_on:
