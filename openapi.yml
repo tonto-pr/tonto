@@ -8,7 +8,7 @@ info:
     url: "https://www.leivalle.org"
     email: "anton.rautio@gmail.com"
 servers:
-  - url: "http://localhost:3000"
+  - url: "https://api.leivalle.org"
     description: "Production API"
 paths:
   /fine:
