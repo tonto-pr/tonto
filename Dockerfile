@@ -1,4 +1,4 @@
-FROM node:12.16.1
+FROM node:12.16.1-alpine3.9
 
 ADD package.json ./tmp/package.json
 ADD yarn.lock ./tmp/yarn.lock

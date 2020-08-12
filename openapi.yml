@@ -14,7 +14,7 @@ paths:
   /fine:
     post:
       tags:
-      - New fine
+        - New fine
       summary: "Create new fines."
       description: "Create new fines to the database."
       operationId: CreateFines
@@ -24,7 +24,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PlainFine'
+              $ref: "#/components/schemas/PlainFine"
       responses:
         200:
           description: Successful response
@@ -33,26 +33,26 @@ paths:
               schema:
                 title: Fine created
                 type: object
-                $ref: '#/components/schemas/Fine'
+                $ref: "#/components/schemas/Fine"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         500:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
   /fine/{fine_id}:
     get:
       tags:
-      - Read Fine
+        - Read Fine
       summary: "Read fines."
       description: "Read fines from the database."
       operationId: ReadFines
       parameters:
-      - name: fine_id
-        in: path
-        description: "**Fine id** *Example: 1*"
-        required: true
-        schema:
-          type: string
-          minimum: 1
+        - name: fine_id
+          in: path
+          description: "**Fine id** *Example: 1*"
+          required: true
+          schema:
+            type: string
+            minimum: 1
       responses:
         200:
           description: Successful response
@@ -61,30 +61,30 @@ paths:
               schema:
                 title: Fine found
                 type: object
-                $ref: '#/components/schemas/Fine'
-        404: 
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/Fine"
+        404:
+          $ref: "#/components/responses/NotFound"
     put:
       tags:
-      - Update fines
+        - Update fines
       summary: "Update fines."
       description: "Update fines in the database."
       operationId: UpdateFines
       parameters:
-      - name: fine_id
-        in: path
-        description: "**Fine id** *Example: 1*"
-        required: true
-        schema:
-          type: string
-          minimum: 1
+        - name: fine_id
+          in: path
+          description: "**Fine id** *Example: 1*"
+          required: true
+          schema:
+            type: string
+            minimum: 1
       requestBody:
         description: Fine body
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PlainFine'
+              $ref: "#/components/schemas/PlainFine"
       responses:
         200:
           description: Successful response
@@ -93,23 +93,23 @@ paths:
               schema:
                 title: Fine updated
                 type: object
-                $ref: '#/components/schemas/Fine'
+                $ref: "#/components/schemas/Fine"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
     delete:
       tags:
-      - Delete fines
+        - Delete fines
       summary: "Delete fines."
       description: "Delete fines from the database."
       operationId: DeleteFines
       parameters:
-      - name: fine_id
-        in: path
-        description: "**Fine id** *Example: 1*"
-        required: true
-        schema:
-          type: string
-          minimum: 1
+        - name: fine_id
+          in: path
+          description: "**Fine id** *Example: 1*"
+          required: true
+          schema:
+            type: string
+            minimum: 1
       responses:
         200:
           description: Successful response
@@ -118,13 +118,13 @@ paths:
               schema:
                 title: Fine deleted
                 type: object
-                $ref: '#/components/schemas/Fine'
+                $ref: "#/components/schemas/Fine"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
   /fines:
     get:
       tags:
-      - Get all fines
+        - Get all fines
       summary: "Get all fines"
       operationId: GetFines
       responses:
@@ -134,13 +134,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Fine'
+                  $ref: "#/components/schemas/Fine"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
   /user:
     post:
       tags:
-      - New fine
+        - New fine
       summary: "Create new userss."
       description: "Create new users to the database."
       operationId: CreateUsers
@@ -150,7 +150,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PlainUser'
+              $ref: "#/components/schemas/PlainUser"
       responses:
         200:
           description: Successful response
@@ -159,28 +159,28 @@ paths:
               schema:
                 title: User created
                 type: object
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
         403:
-          $ref: '#/components/responses/AlreadyExists'
+          $ref: "#/components/responses/AlreadyExists"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         500:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
   /user/{user_id}:
     get:
       tags:
-      - Read User
+        - Read User
       summary: "Read users."
       description: "Read users from the database."
       operationId: ReadUsers
       parameters:
-      - name: user_id
-        in: path
-        description: "**User id** *Example: 1*"
-        required: true
-        schema:
-          type: string
-          minimum: 1
+        - name: user_id
+          in: path
+          description: "**User id** *Example: 1*"
+          required: true
+          schema:
+            type: string
+            minimum: 1
       responses:
         200:
           description: Successful response
@@ -189,17 +189,17 @@ paths:
               schema:
                 title: User found
                 type: object
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
     delete:
       parameters:
-      - name: user_id
-        in: path
-        required: true
-        schema:
-          type: string
-          minimum: 1
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+            minimum: 1
       responses:
         200:
           description: Successful response
@@ -207,13 +207,33 @@ paths:
             application/json:
               schema:
                 type: object
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
+  /user/{user_id}/user_groups:
+    get:
+      parameters:
+        - name: user_id
+          in: path
+          description: "**User id** *Example: 1*"
+          required: true
+          schema:
+            type: string
+            minimum: 1
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserGroup"
+        404:
+          $ref: "#/components/responses/NotFound"
   /users:
     get:
       tags:
-      - Get all users
+        - Get all users
       summary: "Get all users"
       operationId: GetUsers
       responses:
@@ -223,9 +243,9 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: "#/components/schemas/User"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
   /user_group:
     post:
       requestBody:
@@ -233,27 +253,29 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserGroup'
+              $ref: "#/components/schemas/PlainUserGroup"
       responses:
         200:
           content:
             application/json:
               schema:
                 type: object
-                $ref: '#/components/schemas/UserGroup'
+                $ref: "#/components/schemas/UserGroup"
         403:
-          $ref: '#/components/responses/AlreadyExists'
+          $ref: "#/components/responses/AlreadyExists"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/BadRequest"
   /user_group/{user_group_id}:
     get:
       parameters:
-      - name: user_group_id
-        in: path
-        required: true
-        schema:
-          type: string
-          minimum: 1
+        - name: user_group_id
+          in: path
+          required: true
+          schema:
+            type: string
+            minimum: 1
       responses:
         200:
           description: Successful response
@@ -261,17 +283,17 @@ paths:
             application/json:
               schema:
                 type: object
-                $ref: '#/components/schemas/UserGroup'
+                $ref: "#/components/schemas/UserGroup"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
     delete:
       parameters:
-      - name: user_group_id
-        in: path
-        required: true
-        schema:
-          type: string
-          minimum: 1
+        - name: user_group_id
+          in: path
+          required: true
+          schema:
+            type: string
+            minimum: 1
       responses:
         200:
           description: Successful response
@@ -279,18 +301,18 @@ paths:
             application/json:
               schema:
                 type: object
-                $ref: '#/components/schemas/UserGroup'
+                $ref: "#/components/schemas/UserGroup"
         404:
-          $ref: '#/components/responses/NotFound'
-  /user_group/{user_group_id}/members:
+          $ref: "#/components/responses/NotFound"
+  /user_group/{user_group_id}/users:
     get:
       parameters:
-      - name: user_group_id
-        in: path
-        required: true
-        schema:
-          type: string
-          minimum: 1
+        - name: user_group_id
+          in: path
+          required: true
+          schema:
+            type: string
+            minimum: 1
       responses:
         200:
           description: Successful response
@@ -299,21 +321,9 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: "#/components/schemas/User"
         404:
-          $ref: '#/components/responses/NotFound'
-  /groups:
-    get:
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserGroup'
-        404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
   /login:
     post:
       requestBody:
@@ -322,23 +332,23 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserLogin'
+              $ref: "#/components/schemas/UserLogin"
       responses:
         200:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: "#/components/schemas/User"
         401:
-          $ref: '#/components/responses/Unauthorized'
+          $ref: "#/components/responses/Unauthorized"
         404:
-          $ref: '#/components/responses/NotFound'
+          $ref: "#/components/responses/NotFound"
         500:
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
   /test:
     get:
       tags:
-      - For testing purposes
+        - For testing purposes
       summary: "For testing purposes"
       operationId: TestOne
       responses:
@@ -365,7 +375,7 @@ components:
         - username
     User:
       allOf:
-        - $ref: '#/components/schemas/PlainUser'
+        - $ref: "#/components/schemas/PlainUser"
         - type: object
           properties:
             user_id:
@@ -384,7 +394,7 @@ components:
         - description
     Fine:
       allOf:
-        - $ref: '#/components/schemas/PlainFine'
+        - $ref: "#/components/schemas/PlainFine"
         - type: object
           properties:
             fine_id:
@@ -410,24 +420,39 @@ components:
           type: string
         access_token:
           type: string
+    PlainUserGroupNoMembers:
+      type: object
+      properties:
+        user_group_name:
+          type: string
+      required:
+        - user_group_name
     PlainUserGroup:
-        type: object
-        properties:
-          members:
-            type: array
-            items:
-              type: string
-          group_name:
-            type: string
-        required:
-          - group_name
-          - members
-    UserGroup:
       allOf:
-        - $ref: '#/components/schemas/PlainUserGroup'
+        - $ref: "#/components/schemas/PlainUserGroupNoMembers"
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            type: integer
+      required:
+        - users
+    UserGroupNoMembers:
+      allOf:
+        - $ref: "#/components/schemas/PlainUserGroupNoMembers"
         - type: object
           properties:
-            fine_id:
+            user_group_id:
+              type: integer
+          required:
+            - user_group_id
+    UserGroup:
+      allOf:
+        - $ref: "#/components/schemas/PlainUserGroup"
+        - type: object
+          properties:
+            user_group_id:
               type: integer
           required:
             - user_group_id
@@ -437,19 +462,19 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     Unauthorized:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     AlreadyExists:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
     BadRequest:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
