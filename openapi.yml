@@ -8,7 +8,7 @@ info:
     url: "https://www.leivalle.org"
     email: "anton.rautio@gmail.com"
 servers:
-  - url: "https://api.leivalle.org"
+  - url: "http://localhost:3000"
     description: "Production API"
 paths:
   /fine:
@@ -24,7 +24,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PlainFine"
+              $ref: "#/components/schemas/Fine"
       responses:
         200:
           description: Successful response
@@ -34,6 +34,33 @@ paths:
                 title: Fine created
                 type: object
                 $ref: "#/components/schemas/Fine"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/BadRequest"
+  /fine/give:
+    post:
+      tags:
+        - New fine
+      summary: "Create new fines."
+      description: "Create new fines to the database."
+      operationId: CreateFines
+      requestBody:
+        description: Fine body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GivenFine"
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: Fine created
+                type: object
+                $ref: "#/components/schemas/GivenFine"
         404:
           $ref: "#/components/responses/NotFound"
         500:
@@ -84,7 +111,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PlainFine"
+              $ref: "#/components/schemas/Fine"
       responses:
         200:
           description: Successful response
@@ -121,22 +148,6 @@ paths:
                 $ref: "#/components/schemas/Fine"
         404:
           $ref: "#/components/responses/NotFound"
-  /fines:
-    get:
-      tags:
-        - Get all fines
-      summary: "Get all fines"
-      operationId: GetFines
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Fine"
-        404:
-          $ref: "#/components/responses/NotFound"
   /user:
     post:
       tags:
@@ -150,7 +161,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PlainUser"
+              $ref: "#/components/schemas/User"
       responses:
         200:
           description: Successful response
@@ -210,6 +221,54 @@ paths:
                 $ref: "#/components/schemas/User"
         404:
           $ref: "#/components/responses/NotFound"
+  /user/{user_id}/given_fines:
+    get:
+      tags:
+        - Get all fines given by user
+      summary: "Get all fines given by user"
+      operationId: GetFines
+      parameters:
+        - name: user_id
+          in: path
+          description: "**User id** *Example: 1*"
+          required: true
+          schema:
+            type: string
+            minimum: 1
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GivenFine"
+        404:
+          $ref: "#/components/responses/NotFound"
+  /user/{user_id}/received_fines:
+    get:
+      tags:
+        - Get all received fines of user
+      summary: "Get all received fines of user"
+      operationId: GetFines
+      parameters:
+        - name: user_id
+          in: path
+          description: "**User id** *Example: 1*"
+          required: true
+          schema:
+            type: string
+            minimum: 1
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GivenFine"
+        404:
+          $ref: "#/components/responses/NotFound"
   /user/{user_id}/user_groups:
     get:
       parameters:
@@ -230,22 +289,6 @@ paths:
                   $ref: "#/components/schemas/UserGroup"
         404:
           $ref: "#/components/responses/NotFound"
-  /users:
-    get:
-      tags:
-        - Get all users
-      summary: "Get all users"
-      operationId: GetUsers
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/User"
-        404:
-          $ref: "#/components/responses/NotFound"
   /user_group:
     post:
       requestBody:
@@ -253,7 +296,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PlainUserGroup"
+              $ref: "#/components/schemas/UserGroup"
       responses:
         200:
           content:
@@ -359,9 +402,53 @@ paths:
                 type: string
 components:
   schemas:
-    PlainUser:
+    GivenFine:
       type: object
       properties:
+        given_fine_id:
+          type: integer
+        receiver_user_id:
+          type: integer
+        giver_user_id:
+          type: integer
+        user_group_id:
+          type: integer
+        fine_id:
+          type: integer
+      required:
+        - receiver_user_id
+        - giver_user_id
+        - user_group_id
+        - fine_id
+    UserGroupUsers:
+      type: object
+      properties:
+        user_group_users_id:
+          type: integer
+        user_group_id:
+          type: integer
+        user_id:
+          type: integer
+      required:
+        - user_group_id
+        - user_id
+    Fine:
+      type: object
+      properties:
+        fine_id:
+          type: integer
+        amount:
+          type: integer
+        description:
+          type: string
+      required:
+        - amount
+        - description
+    User:
+      type: object
+      properties:
+        user_id:
+          type: integer
         email:
           type: string
         username:
@@ -373,34 +460,15 @@ components:
       required:
         - email
         - username
-    User:
-      allOf:
-        - $ref: "#/components/schemas/PlainUser"
-        - type: object
-          properties:
-            user_id:
-              type: integer
-          required:
-            - user_id
-    PlainFine:
+    UserGroup:
       type: object
       properties:
-        amount:
+        user_group_id:
           type: integer
-        description:
+        user_group_name:
           type: string
       required:
-        - amount
-        - description
-    Fine:
-      allOf:
-        - $ref: "#/components/schemas/PlainFine"
-        - type: object
-          properties:
-            fine_id:
-              type: integer
-          required:
-            - fine_id
+        - user_group_name
     Error:
       type: object
       properties:
@@ -420,42 +488,6 @@ components:
           type: string
         access_token:
           type: string
-    PlainUserGroupNoMembers:
-      type: object
-      properties:
-        user_group_name:
-          type: string
-      required:
-        - user_group_name
-    PlainUserGroup:
-      allOf:
-        - $ref: "#/components/schemas/PlainUserGroupNoMembers"
-      type: object
-      properties:
-        users:
-          type: array
-          items:
-            type: integer
-      required:
-        - users
-    UserGroupNoMembers:
-      allOf:
-        - $ref: "#/components/schemas/PlainUserGroupNoMembers"
-        - type: object
-          properties:
-            user_group_id:
-              type: integer
-          required:
-            - user_group_id
-    UserGroup:
-      allOf:
-        - $ref: "#/components/schemas/PlainUserGroup"
-        - type: object
-          properties:
-            user_group_id:
-              type: integer
-          required:
-            - user_group_id
   responses:
     NotFound:
       description: The specified fine was not found

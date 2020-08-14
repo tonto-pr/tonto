@@ -13,120 +13,134 @@ import { knex } from "../../db/database";
 const spec: api.Endpoints = {
   "/fine": {
     post: async (ctx) => {
-      if (ctx.body.value.amount > 2000000000) {
-        return runtime.json(500, {
-          message:
-            "Amount is too large. Please submit an amount less than 2 Billion.",
-          status: 500,
-        });
-      }
-      const fines: types.ShapeOfFine[] = await knex("dim_fines")
+      const fine: types.ShapeOfFine[] = await knex("dim_fines")
         .returning("*")
-        .insert(ctx.body.value as types.ShapeOfPlainFine);
+        .insert(ctx.body.value as types.ShapeOfFine);
 
-      if (fines.length > 0) {
-        return runtime.json(200, fines[0]);
+      if (fine) {
+        return runtime.json(200, fine[0]);
       }
+
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
+  },
+  "/fine/give": {
+    post: async (ctx) => {
+      const givenFine: types.ShapeOfGivenFine[] = await knex("fact_given_fines")
+        .returning("*")
+        .insert(ctx.body.value as types.ShapeOfGivenFine);
+
+      if (givenFine) {
+        return runtime.json(200, givenFine[0]);
+      }
+
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
   "/fine/{fine_id}": {
-    delete: async (ctx) => {
-      const fines: types.ShapeOfFine[] = await knex("dim_fines")
-        .where({ fine_id: parseInt(ctx.params.fine_id) })
-        .returning("*")
-        .del();
-
-      if (fines.length > 0) {
-        return runtime.json(200, fines[0]);
-      }
-      return runtime.json(404, { message: "not found", status: 404 });
-    },
     get: async (ctx) => {
-      const fines: types.ShapeOfFine[] = await knex("dim_fines")
+      const fine: types.ShapeOfFine[] = await knex("dim_fines")
         .select("*")
-        .where({ fine_id: parseInt(ctx.params.fine_id) });
+        .where({ fine_id: ctx.params.fine_id });
 
-      if (fines.length > 0) {
-        return runtime.json(200, fines[0]);
+      if (fine) {
+        return runtime.json(200, fine[0]);
       }
+
       return runtime.json(404, { message: "not found", status: 404 });
     },
     put: async (ctx) => {
-      const fines: types.ShapeOfFine[] = await knex("dim_fines")
-        .where({ fine_id: ctx.params.fine_id })
+      const fine: types.ShapeOfFine[] = await knex("dim_fines")
+        .where({
+          fine_id: ctx.params.fine_id,
+        })
         .returning("*")
-        .update(ctx.body.value as types.ShapeOfPlainFine);
+        .update(ctx.body.value);
 
-      if (fines.length > 0) {
-        return runtime.json(200, fines[0]);
+      if (fine) {
+        return runtime.json(200, fine[0]);
       }
+
       return runtime.json(404, { message: "not found", status: 404 });
     },
-  },
-  "/fines": {
-    get: async (ctx) => {
-      const fines: types.ShapeOfFine[] = await knex("dim_fines").select("*");
+    delete: async (ctx) => {
+      const fine: types.ShapeOfFine[] = await knex("dim_fines")
+        .where({ fine_id: ctx.params.fine_id })
+        .returning("*")
+        .del();
 
-      if (fines) {
-        return runtime.json(200, fines);
+      if (fine) {
+        return runtime.json(200, fine[0]);
       }
+
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
   "/user": {
     post: async (ctx) => {
-      const existing_user: types.ShapeOfUser[] = await knex("dim_users")
-        .select("*")
-        .where({ username: ctx.body.value.username });
+      const user: types.ShapeOfUser[] = await knex("dim_users")
+        .returning("*")
+        .insert(ctx.body.value as types.ShapeOfUser);
 
-      if (existing_user.length > 0) {
-        return runtime.json(403, {
-          message: "username already exists",
-          status: 403,
-        });
+      if (user) {
+        return runtime.json(200, user[0]);
       }
 
-      if (!ctx.body.value.password) {
-        return runtime.json(500, {
-          message: "please provide a password",
-          status: 500,
-        });
-      }
-
-      const encrypted_user = { ...ctx.body.value };
-
-      encrypted_user.password = bcrypt.hashSync(ctx.body.value.password, 10);
-      encrypted_user.access_token = cryptoRandom({ length: 30 });
-      const users: types.ShapeOfUser[] = await knex("dim_users")
-        .returning(["user_id", "username", "access_token", "email"])
-        .insert(encrypted_user as types.ShapeOfPlainUser);
-      if (users.length > 0) {
-        return runtime.json(200, users[0]);
-      }
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
   "/user/{user_id}": {
-    delete: async (ctx) => {
-      const users: types.ShapeOfUser[] = await knex("dim_users")
-        .where({ user_id: parseInt(ctx.params.user_id) })
-        .returning(["user_id", "username", "email"])
-        .del();
+    get: async (ctx) => {
+      const user: types.ShapeOfUser[] = await knex("dim_users")
+        .select("*")
+        .where({ user_id: ctx.params.user_id });
 
-      if (users.length > 0) {
-        return runtime.json(200, users[0]);
+      if (user) {
+        return runtime.json(200, user[0]);
       }
+
       return runtime.json(404, { message: "not found", status: 404 });
     },
-    get: async (ctx) => {
-      const users: types.ShapeOfUser[] = await knex("dim_users")
-        .select(["user_id", "username", "email"])
-        .where({ user_id: parseInt(ctx.params.user_id) });
+    delete: async (ctx) => {
+      const user: types.ShapeOfUser[] = await knex("dim_users")
+        .where({ user_id: ctx.params.user_id })
+        .returning("*")
+        .del();
 
-      if (users.length > 0) {
-        return runtime.json(200, users[0]);
+      if (user) {
+        return runtime.json(200, user[0]);
       }
+
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
+  },
+  "/user/{user_id}/given_fines": {
+    get: async (ctx) => {
+      const givenFines: types.ShapeOfGivenFine[] = await knex(
+        "fact_given_fines"
+      )
+        .select("*")
+        .where({ giver_user_id: ctx.params.user_id });
+
+      if (givenFines) {
+        return runtime.json(200, givenFines);
+      }
+
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
+  },
+  "/user/{user_id}/received_fines": {
+    get: async (ctx) => {
+      const receivedFines: types.ShapeOfGivenFine[] = await knex(
+        "fact_given_fines"
+      )
+        .select("*")
+        .where({ receiver_user_id: ctx.params.user_id });
+
+      if (receivedFines) {
+        return runtime.json(200, receivedFines);
+      }
+
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
@@ -135,7 +149,7 @@ const spec: api.Endpoints = {
       const userGroups: types.ShapeOfUserGroup[] = await knex(
         "fact_user_group_users"
       )
-        .select("*")
+        .select("dim_user_groups.*")
         .leftJoin(
           "dim_user_groups",
           "fact_user_group_users.user_group_id",
@@ -143,139 +157,63 @@ const spec: api.Endpoints = {
         )
         .where({ user_id: ctx.params.user_id });
 
-      if (userGroups.length > 0) {
+      if (userGroups) {
         return runtime.json(200, userGroups);
-      }
-      return runtime.json(404, { message: "not found", status: 404 });
-    },
-  },
-  "/users": {
-    get: async (ctx) => {
-      const users: types.ShapeOfUser[] = await knex("dim_users").select([
-        "user_id",
-        "username",
-        "email",
-      ]);
-
-      if (users.length > 0) {
-        return runtime.json(200, users);
       }
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
   "/user_group": {
     post: async (ctx) => {
-      let { users, ...userGroupBody } = ctx.body.value;
-
-      if (!users || users.length === 0) {
-        return runtime.json(500, {
-          message: "please define users for the user group",
-          status: 500,
-        });
-      }
-
-      const existingUserGroups: types.ShapeOfUserGroup[] = await knex(
-        "dim_user_groups"
-      )
-        .select("*")
-        .where({ user_group_name: userGroupBody.user_group_name });
-
-      if (existingUserGroups.length > 0) {
-        return runtime.json(403, {
-          message: "group name already exists",
-          status: 403,
-        });
-      }
-
-      const userGroups: types.ShapeOfUserGroup[] = await knex("dim_user_groups")
+      const userGroup: types.ShapeOfUserGroup[] = await knex("dim_user_groups")
         .returning("*")
-        .insert(userGroupBody as types.ShapeOfPlainUserGroup);
+        .insert(ctx.body.value as types.ShapeOfUserGroup);
 
-      if (userGroups.length > 0) {
-        const userGroup = userGroups[0];
-        users.map(async (user) => {
-          return await knex("fact_user_group_users")
-            .returning("user_id")
-            .insert({
-              user_id: user,
-              user_group_id: userGroup.user_group_id,
-            });
-        });
-        return runtime.json(200, {
-          users,
-          ...userGroup,
-        } as types.ShapeOfUserGroup);
+      if (userGroup) {
+        return runtime.json(200, userGroup[0]);
       }
+
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
   "/user_group/{user_group_id}": {
+    get: async (ctx) => {
+      const userGroup: types.ShapeOfUserGroup[] = await knex("dim_user_groups")
+        .select("*")
+        .where({ user_group_id: ctx.params.user_group_id });
+
+      if (userGroup) {
+        return runtime.json(200, userGroup[0]);
+      }
+
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
     delete: async (ctx) => {
-      const userGroups: types.ShapeOfUserGroup[] = await knex("dim_user_groups")
-        .where({ user_group_id: parseInt(ctx.params.user_group_id) })
+      const userGroup: types.ShapeOfUserGroup[] = await knex("dim_user_groups")
+        .where({ user_group_id: ctx.params.user_group_id })
         .returning("*")
         .del();
 
-      await knex("fact_user_group_users")
-        .where({
-          user_group_id: parseInt(ctx.params.user_group_id),
-        })
-        .del();
-
-      if (userGroups.length > 0) {
-        return runtime.json(200, userGroups[0]);
+      if (userGroup) {
+        return runtime.json(200, userGroup[0]);
       }
-      return runtime.json(404, { message: "not found", status: 404 });
-    },
-    get: async (ctx) => {
-      const userGroups: types.ShapeOfUserGroupNoMembers[] = await knex(
-        "dim_user_groups"
-      )
-        .select("*")
-        .where({ user_group_id: parseInt(ctx.params.user_group_id) });
 
-      if (userGroups.length > 0) {
-        const userGroup = userGroups[0];
-        const userGroupMembers = (
-          await knex("fact_user_group_users")
-            .select("user_id")
-            .where({
-              user_group_id: parseInt(ctx.params.user_group_id),
-            })
-        ).map((row) => row.user_id);
-
-        const userGroupWithMembers: types.ShapeOfUserGroup = {
-          ...userGroup,
-          users: userGroupMembers,
-        };
-        return runtime.json(200, userGroupWithMembers);
-      }
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
   "/user_group/{user_group_id}/users": {
     get: async (ctx) => {
-      const userGroups: types.ShapeOfUserGroup[] = await knex("dim_user_groups")
-        .select("*")
-        .where({ user_group_id: parseInt(ctx.params.user_group_id) });
-
-      if (userGroups.length === 0) {
-        return runtime.json(404, { message: "not found", status: 404 });
-      }
-
-      const userGroupUsers: types.ShapeOfUser[] = await knex(
-        "fact_user_group_users"
-      )
-        .select("*")
-        .where({ user_group_id: userGroups[0].user_group_id })
+      const users: types.ShapeOfUser[] = await knex("fact_user_group_users")
+        .select("dim_users.*")
         .leftJoin(
           "dim_users",
           "fact_user_group_users.user_id",
           "dim_users.user_id"
-        );
+        )
+        .where({ user_group_id: ctx.params.user_group_id });
 
-      if (userGroupUsers) {
-        return runtime.json(200, userGroupUsers);
+      if (users) {
+        return runtime.json(200, users);
       }
       return runtime.json(404, { message: "not found", status: 404 });
     },
@@ -317,37 +255,6 @@ const spec: api.Endpoints = {
         console.log("Duplicate users found");
       }
       return runtime.json(404, { message: "not found", status: 404 });
-    },
-  },
-  "/test": {
-    get: async (ctx) => {
-      const fines: types.ShapeOfFine[] = await knex("dim_fines")
-        .returning("*")
-        .insert({
-          amount: 10,
-          description: "sakko.appin laiminlyönti",
-        } as types.ShapeOfPlainFine);
-      const users: types.ShapeOfUser[] = await knex("dim_users")
-        .returning(["user_id", "username", "email"])
-        .insert({
-          email: "testo@tmc.fi",
-          username: "testo",
-          password: "abcde",
-        } as types.ShapeOfPlainUser);
-      const userGroups: types.ShapeOfUserGroup[] = await knex("dim_user_groups")
-        .returning("*")
-        .insert({
-          user_group_name: "MOI",
-        } as types.ShapeOfPlainUserGroupNoMembers);
-      const fine = fines[0];
-      const user = users[0];
-      const userGroup = userGroups[0];
-      console.log(user);
-      console.log(userGroup);
-      return runtime.text(
-        200,
-        `${fine.fine_id} + ${fine.amount} + ${fine.description}`
-      );
     },
   },
 };
