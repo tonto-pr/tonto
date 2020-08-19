@@ -1,18 +1,40 @@
 import * as api from "../../generated/server.generated";
 import * as types from "../../generated/common.types.generated";
 import * as runtime from "@smartlyio/oats-runtime";
-
+import * as bcrypt from "bcryptjs";
+import * as cryptoRandom from "crypto-random-string";
 import { knex } from "../../db/database";
 
 export const userEndpoints: api.Endpoints = {
   "/user": {
     post: async (ctx) => {
-      const user: types.ShapeOfUser[] = await knex("dim_users")
-        .returning("*")
-        .insert(ctx.body.value as types.ShapeOfUser);
+      const existingUser: types.ShapeOfUser[] = await knex("dim_users")
+        .select("*")
+        .where({ username: ctx.body.value.username });
 
-      if (user) {
-        return runtime.json(200, user[0]);
+      if (existingUser.length > 0) {
+        return runtime.json(403, {
+          message: "username already exists",
+          status: 403,
+        });
+      }
+
+      if (!ctx.body.value.password) {
+        return runtime.json(500, {
+          message: "please provide a password",
+          status: 500,
+        });
+      }
+      const encrypted_user = { ...ctx.body.value };
+      encrypted_user.password = bcrypt.hashSync(ctx.body.value.password, 10);
+
+      encrypted_user.access_token = cryptoRandom({ length: 30 });
+      const users: types.ShapeOfUser[] = await knex("dim_users")
+        .returning(["user_id", "username", "access_token", "email"])
+        .insert(encrypted_user as types.ShapeOfUser);
+
+      if (users.length > 0) {
+        return runtime.json(200, users[0]);
       }
 
       return runtime.json(404, { message: "not found", status: 404 });
