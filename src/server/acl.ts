@@ -13,7 +13,6 @@ export const aclEndpoints: api.Endpoints = {
         const users: types.ShapeOfUser[] = await knex("dim_users")
           .select(["user_id", "username", "email"])
           .where({ access_token: ctx.body.value.access_token });
-
         if (users.length === 1) {
           return runtime.json(200, users[0]);
         }
@@ -21,9 +20,8 @@ export const aclEndpoints: api.Endpoints = {
 
       const users: types.ShapeOfUser[] = await knex("dim_users")
         .where({ username: ctx.body.value.username })
-        .returning(["user_id", "username", "email", "password"])
+        .returning(["user_id", "username", "email", "password", "access_token"])
         .update({ access_token: cryptoRandom({ length: 30 }) });
-
       if (users.length === 1) {
         const { password, ...user } = users[0];
         if (!ctx.body.value.password) {
