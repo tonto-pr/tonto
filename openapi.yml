@@ -203,6 +203,38 @@ paths:
                 $ref: "#/components/schemas/User"
         404:
           $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - Update users
+      summary: "Update users."
+      description: "Update users in the database."
+      operationId: UpdateUsers
+      parameters:
+        - name: user_id
+          in: path
+          description: "**User id** *Example: 1*"
+          required: true
+          schema:
+            type: string
+            minimum: 1
+      requestBody:
+        description: User body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        200:
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                title: User updated
+                type: object
+                $ref: "#/components/schemas/User"
+        404:
+          $ref: "#/components/responses/NotFound"
     delete:
       parameters:
         - name: user_id
