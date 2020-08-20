@@ -43,8 +43,22 @@ export const userEndpoints: api.Endpoints = {
   "/user/{user_id}": {
     get: async (ctx) => {
       const user: types.ShapeOfUser[] = await knex("dim_users")
-        .select("*")
+        .select(["user_id", "username", "email"])
         .where({ user_id: ctx.params.user_id });
+
+      if (user) {
+        return runtime.json(200, user[0]);
+      }
+
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
+    put: async (ctx) => {
+      const user: types.ShapeOfUser[] = await knex("dim_users")
+        .where({
+          user_id: ctx.params.user_id,
+        })
+        .returning(["user_id", "username", "email"])
+        .update(ctx.body.value);
 
       if (user) {
         return runtime.json(200, user[0]);
@@ -55,7 +69,7 @@ export const userEndpoints: api.Endpoints = {
     delete: async (ctx) => {
       const user: types.ShapeOfUser[] = await knex("dim_users")
         .where({ user_id: ctx.params.user_id })
-        .returning("*")
+        .returning(["user_id", "username", "email"])
         .del();
 
       if (user) {
