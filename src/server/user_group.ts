@@ -46,7 +46,7 @@ export const userGroupEndpoints: api.Endpoints = {
   "/user_group/{user_group_id}/users": {
     get: async (ctx) => {
       const users: types.ShapeOfUser[] = await knex("fact_user_group_users")
-        .select("dim_users.*")
+        .select(["dim_users.user_id", "dim_users.username", "dim_users.email"])
         .leftJoin(
           "dim_users",
           "fact_user_group_users.user_id",
