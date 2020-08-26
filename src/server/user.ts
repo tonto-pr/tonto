@@ -40,6 +40,21 @@ export const userEndpoints: api.Endpoints = {
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
+  "/user/search": {
+    get: async (ctx) => {
+      if (ctx.query.query === "") {
+        return runtime.json(200, []);
+      }
+      const users: types.ShapeOfUser[] = await knex("dim_users")
+        .select(["user_id", "username", "email"])
+        .where("username", "ilike", `%${ctx.query.query}%`);
+
+      if (users.length > 0) {
+        return runtime.json(200, users);
+      }
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
+  },
   "/user/{user_id}": {
     get: async (ctx) => {
       const user: types.ShapeOfUser[] = await knex("dim_users")
