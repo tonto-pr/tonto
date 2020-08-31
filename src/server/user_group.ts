@@ -18,6 +18,44 @@ export const userGroupEndpoints: api.Endpoints = {
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
+  "/user_group/users/add": {
+    post: async (ctx) => {
+      const userGroupUsers = await Promise.all(
+        ctx.body.value.map((userGroupUser) => {
+          return knex("fact_user_group_users")
+            .returning("*")
+            .insert(userGroupUser as types.ShapeOfUserGroupUsers);
+        })
+      );
+
+      if (userGroupUsers.length > 0) {
+        return runtime.json(200, ctx.body.value);
+      }
+
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
+  },
+  "/user_group/users/delete": {
+    post: async (ctx) => {
+      const userGroupUsers = await Promise.all(
+        ctx.body.value.map((userGroupUser) => {
+          return knex("fact_user_group_users")
+            .returning("*")
+            .where({
+              user_group_id: userGroupUser.user_group_id,
+              user_id: userGroupUser.user_id,
+            })
+            .del();
+        })
+      );
+
+      if (userGroupUsers.length > 0) {
+        return runtime.json(200, ctx.body.value);
+      }
+
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
+  },
   "/user_group/{user_group_id}": {
     get: async (ctx) => {
       const userGroup: types.ShapeOfUserGroup[] = await knex("dim_user_groups")
@@ -57,23 +95,6 @@ export const userGroupEndpoints: api.Endpoints = {
       if (users) {
         return runtime.json(200, users);
       }
-      return runtime.json(404, { message: "not found", status: 404 });
-    },
-  },
-  "/user_group/users/add": {
-    post: async (ctx) => {
-      const userGroupUsers = await Promise.all(
-        ctx.body.value.map((userGroupUsers) => {
-          return knex("fact_user_group_users")
-            .returning("*")
-            .insert(userGroupUsers as types.ShapeOfUserGroupUsers);
-        })
-      );
-
-      if (userGroupUsers.length > 0) {
-        return runtime.json(200, ctx.body.value);
-      }
-
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
