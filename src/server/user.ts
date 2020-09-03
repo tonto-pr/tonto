@@ -91,6 +91,31 @@ export const userEndpoints: api.Endpoints = {
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
+  "/user/{user_id}/feed": {
+    get: async (ctx) => {
+      const userGroupUsers: types.UserGroupUsers[] = await knex(
+        "fact_user_group_users"
+      )
+        .select("user_group_id")
+        .where({ user_id: ctx.params.user_id });
+
+      const givenFines: types.ShapeOfGivenFine[] = (
+        await Promise.all(
+          userGroupUsers.map(async (userGroupUser) => {
+            return await knex("fact_given_fines")
+              .select("*")
+              .where({ user_group_id: userGroupUser.user_group_id });
+          })
+        )
+      ).flat();
+
+      if (givenFines) {
+        return runtime.json(200, givenFines);
+      }
+
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
+  },
   "/user/{user_id}/given_fines": {
     get: async (ctx) => {
       const givenFines: types.ShapeOfGivenFine[] = await knex(
