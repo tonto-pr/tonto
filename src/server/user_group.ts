@@ -18,6 +18,18 @@ export const userGroupEndpoints: api.Endpoints = {
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
+  "/user_group/search": {
+    get: async (ctx) => {
+      const userGroups: types.ShapeOfUserGroup[] = await knex("dim_user_groups")
+        .select("*")
+        .where("user_group_name", "ilike", `%${ctx.query.query}%`);
+
+      if (userGroups.length > 0) {
+        return runtime.json(200, userGroups);
+      }
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
+  },
   "/user_group/users/add": {
     post: async (ctx) => {
       const userGroupUsers = await Promise.all(
