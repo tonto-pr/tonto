@@ -273,6 +273,26 @@ paths:
                 $ref: "#/components/schemas/User"
         404:
           $ref: "#/components/responses/NotFound"
+  /user/{user_id}/feed:
+    get:
+      parameters:
+        - name: user_id
+          in: path
+          description: "**User id** *Example: 1*"
+          required: true
+          schema:
+            type: string
+            minimum: 1
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GivenFine"
+        404:
+          $ref: "#/components/responses/NotFound"
   /user/{user_id}/given_fines:
     get:
       tags:
