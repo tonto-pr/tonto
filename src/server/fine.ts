@@ -18,6 +18,18 @@ export const fineEndpoints: api.Endpoints = {
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
+  "/fine/search": {
+    get: async (ctx) => {
+      const fines: types.ShapeOfFine[] = await knex("dim_fines")
+        .select("*")
+        .where("description", "ilike", `%${ctx.query.query}%`);
+
+      if (fines.length > 0) {
+        return runtime.json(200, fines);
+      }
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
+  },
   "/fine/give": {
     post: async (ctx) => {
       const givenFine: types.ShapeOfGivenFine[] = await knex("fact_given_fines")

@@ -38,6 +38,26 @@ paths:
           $ref: "#/components/responses/NotFound"
         500:
           $ref: "#/components/responses/BadRequest"
+  /fine/search:
+    get:
+      parameters:
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Fine"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/BadRequest"
   /fine/give:
     post:
       tags:
@@ -378,6 +398,26 @@ paths:
                 $ref: "#/components/schemas/UserGroup"
         403:
           $ref: "#/components/responses/AlreadyExists"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/BadRequest"
+  /user_group/search:
+    get:
+      parameters:
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserGroup"
         404:
           $ref: "#/components/responses/NotFound"
         500:
