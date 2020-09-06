@@ -99,12 +99,28 @@ export const userEndpoints: api.Endpoints = {
         .select("user_group_id")
         .where({ user_id: ctx.params.user_id });
 
-      const givenFines: types.ShapeOfGivenFine[] = (
+      const givenFines: types.ShapeOfGivenFineWithProps[] = (
         await Promise.all(
           userGroupUsers.map(async (userGroupUser) => {
-            return await knex("fact_given_fines")
-              .select("*")
-              .where({ user_group_id: userGroupUser.user_group_id });
+            const { rows } = await knex.raw(`
+              SELECT
+                row_to_json(dim_users_receiver) as receiver_user,
+                row_to_json(dim_users_giver) as giver_user,
+                row_to_json(dim_user_groups) as user_group,
+                row_to_json(dim_fines) as fine,
+                given_fine_id
+              FROM fact_given_fines
+              LEFT JOIN (SELECT user_id, username, email FROM dim_users) dim_users_receiver
+              ON dim_users_receiver.user_id = fact_given_fines.receiver_user_id
+              LEFT JOIN (SELECT user_id, username, email FROM dim_users) dim_users_giver
+              ON dim_users_giver.user_id = fact_given_fines.giver_user_id
+              LEFT JOIN dim_user_groups
+              ON dim_user_groups.user_group_id = fact_given_fines.user_group_id
+              LEFT JOIN dim_fines
+              ON dim_fines.fine_id = fact_given_fines.fine_id
+              WHERE fact_given_fines.user_group_id = ${userGroupUser.user_group_id};
+            `);
+            return rows as types.ShapeOfGivenFineWithProps;
           })
         )
       ).flat();

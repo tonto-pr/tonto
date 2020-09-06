@@ -310,7 +310,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/GivenFine"
+                  $ref: "#/components/schemas/GivenFineWithProps"
         404:
           $ref: "#/components/responses/NotFound"
   /user/{user_id}/given_fines:
