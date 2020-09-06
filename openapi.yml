@@ -439,7 +439,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/UserGroupUsers"
+                  $ref: "#/components/schemas/UserGroupUsersWithProps"
         403:
           $ref: "#/components/responses/AlreadyExists"
         404:
@@ -463,7 +463,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/UserGroupUsers"
+                  $ref: "#/components/schemas/UserGroupUsersWithProps"
         403:
           $ref: "#/components/responses/AlreadyExists"
         404:
@@ -580,6 +580,25 @@ components:
         - giver_user_id
         - user_group_id
         - fine_id
+    GivenFineWithProps:
+      type: object
+      properties:
+        given_fine_id:
+          type: integer
+        receiver_user:
+          $ref: "#/components/schemas/User"
+        giver_user:
+          $ref: "#/components/schemas/User"
+        user_group:
+          $ref: "#/components/schemas/UserGroup"
+        fine:
+          $ref: "#/components/schemas/Fine"
+      required:
+        - given_fine_id
+        - receiver_user
+        - giver_user
+        - user_group
+        - fine
     UserGroupUsers:
       type: object
       properties:
@@ -592,6 +611,19 @@ components:
       required:
         - user_group_id
         - user_id
+    UserGroupUsersWithProps:
+      type: object
+      properties:
+        user_group_users_id:
+          type: integer
+        user_group:
+          $ref: "#/components/schemas/UserGroup"
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - user_group_users_id
+        - user_group
+        - user
     Fine:
       type: object
       properties:
