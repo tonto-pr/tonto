@@ -20,9 +20,25 @@ export const fineEndpoints: api.Endpoints = {
   },
   "/fine/search": {
     get: async (ctx) => {
-      const fines: types.ShapeOfFine[] = await knex("dim_fines")
-        .select("*")
-        .where("description", "ilike", `%${ctx.query.query}%`);
+      let fines: types.ShapeOfFine[];
+
+      if (ctx.query.usergroup_id) {
+        fines = await knex("fact_user_group_fines")
+          .select("dim_fines.*")
+          .leftJoin(
+            "dim_fines",
+            "fact_user_group_fines.fine_id",
+            "dim_fines.fine_id"
+          )
+          .where("description", "ilike", `%${ctx.query.query}%`)
+          .andWhere({
+            usergroup_id: ctx.query.usergroup_id,
+          });
+      } else {
+        fines = await knex("dim_fines")
+          .select("*")
+          .where("description", "ilike", `%${ctx.query.query}%`);
+      }
 
       if (fines.length > 0) {
         return runtime.json(200, fines);
