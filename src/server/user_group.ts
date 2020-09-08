@@ -74,7 +74,6 @@ export const userGroupEndpoints: api.Endpoints = {
         await Promise.all(
           ctx.body.value
             .map(async (userGroupUser) => {
-              console.log(userGroupUser);
               const { rows } = await knex.raw(`
                 SELECT row_to_json(dim_users) as user, row_to_json(dim_user_groups) as user_group, user_group_users_id
                 FROM fact_user_group_users
@@ -85,7 +84,6 @@ export const userGroupEndpoints: api.Endpoints = {
                 WHERE fact_user_group_users.user_group_id = ${userGroupUser.user_group_id}
                 AND fact_user_group_users.user_id = ${userGroupUser.user_id};
               `);
-              console.log(rows);
               return rows as types.ShapeOfUserGroupUsersWithProps;
             })
             .flat()
@@ -108,6 +106,87 @@ export const userGroupEndpoints: api.Endpoints = {
 
       if (userGroupUsers.length > 0) {
         return runtime.json(200, userGroupUsersWithProps);
+      }
+
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
+  },
+  "/user_group/fines/add": {
+    post: async (ctx) => {
+      const userGroupFines: types.ShapeOfUserGroupFines[] = (
+        await Promise.all(
+          ctx.body.value.map((userGroupFine) => {
+            return knex("fact_user_group_fines")
+              .returning("*")
+              .insert(userGroupFine) as Promise<types.ShapeOfUserGroupFines>;
+          })
+        )
+      ).flat();
+
+      const userGroupFinesWithProps: types.ShapeOfUserGroupFinesWithProps[] = (
+        await Promise.all(
+          userGroupFines
+            .map(async (userGroupFine) => {
+              const { rows } = await knex.raw(`
+                SELECT row_to_json(dim_fines) as fine, row_to_json(dim_user_groups) as user_group, user_group_fines_id
+                FROM fact_user_group_fines
+                LEFT JOIN dim_fines
+                ON dim_fines.fine_id = fact_user_group_fines.fine_id
+                LEFT JOIN dim_user_groups
+                ON dim_user_groups.user_group_id = fact_user_group_fines.user_group_id
+                WHERE user_group_fines_id = ${userGroupFine.user_group_fines_id};
+              `);
+              return rows as types.ShapeOfUserGroupFinesWithProps;
+            })
+            .flat()
+        )
+      ).flat();
+
+      if (userGroupFinesWithProps.length > 0) {
+        return runtime.json(200, userGroupFinesWithProps);
+      }
+
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
+  },
+  "/user_group/fines/delete": {
+    post: async (ctx) => {
+      const userGroupFinesWithProps: types.ShapeOfUserGroupFinesWithProps[] = (
+        await Promise.all(
+          ctx.body.value
+            .map(async (userGroupFine) => {
+              const { rows } = await knex.raw(`
+                SELECT row_to_json(dim_fines) as fine, row_to_json(dim_user_groups) as user_group, user_group_fines_id
+                FROM fact_user_group_fines
+                LEFT JOIN dim_fines
+                ON dim_fines.fine_id = fact_user_group_fines.fine_id
+                LEFT JOIN dim_user_groups
+                ON dim_user_groups.user_group_id = fact_user_group_fines.user_group_id
+                WHERE fact_user_group_fines.user_group_id = ${userGroupFine.user_group_id}
+                AND fact_user_group_fines.fine_id = ${userGroupFine.fine_id};
+              `);
+              return rows as types.ShapeOfUserGroupFinesWithProps;
+            })
+            .flat()
+        )
+      ).flat();
+
+      const userGroupFines: types.ShapeOfUserGroupFines[] = (
+        await Promise.all(
+          ctx.body.value.map((userGroupFine) => {
+            return knex("fact_user_group_fines")
+              .returning("*")
+              .where({
+                user_group_id: userGroupFine.user_group_id,
+                fine_id: userGroupFine.fine_id,
+              })
+              .del() as Promise<types.ShapeOfUserGroupFines>;
+          })
+        )
+      ).flat();
+
+      if (userGroupFines.length > 0) {
+        return runtime.json(200, userGroupFinesWithProps);
       }
 
       return runtime.json(404, { message: "not found", status: 404 });

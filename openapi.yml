@@ -470,6 +470,54 @@ paths:
           $ref: "#/components/responses/NotFound"
         500:
           $ref: "#/components/responses/BadRequest"
+  /user_group/fines/add:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/UserGroupFines"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserGroupFinesWithProps"
+        403:
+          $ref: "#/components/responses/AlreadyExists"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/BadRequest"
+  /user_group/fines/delete:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/UserGroupFines"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserGroupFinesWithProps"
+        403:
+          $ref: "#/components/responses/AlreadyExists"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/BadRequest"
   /user_group/{user_group_id}:
     get:
       parameters:
@@ -624,15 +672,40 @@ components:
         - user_group_users_id
         - user_group
         - user
+    UserGroupFines:
+      type: object
+      properties:
+        user_group_fines_id:
+          type: integer
+        user_group_id:
+          type: integer
+        fine_id:
+          type: integer
+      required:
+        - user_group_id
+        - fine_id
+    UserGroupFinesWithProps:
+      type: object
+      properties:
+        user_group_fines_id:
+          type: integer
+        user_group:
+          $ref: "#/components/schemas/UserGroup"
+        fine:
+          $ref: "#/components/schemas/Fine"
+      required:
+        - user_group_fines_id
+        - user_group
+        - fine
     Fine:
       type: object
       properties:
         fine_id:
           type: integer
-        amount:
-          type: integer
         description:
           type: string
+        amount:
+          type: integer
       required:
         - amount
         - description
