@@ -42,9 +42,24 @@ export const userEndpoints: api.Endpoints = {
   },
   "/user/search": {
     get: async (ctx) => {
-      const users: types.ShapeOfUser[] = await knex("dim_users")
-        .select(["user_id", "username", "email"])
-        .where("username", "ilike", `%${ctx.query.query}%`);
+      let users: types.ShapeOfUser[];
+      if (ctx.query.usergroup_id) {
+        users = await knex("fact_user_group_users")
+          .select(["dim_users.user_id", "username", "email"])
+          .leftJoin(
+            "dim_users",
+            "fact_user_group_users.user_id",
+            "dim_users.user_id"
+          )
+          .where("description", "ilike", `%${ctx.query.query}%`)
+          .andWhere({
+            usergroup_id: ctx.query.usergroup_id,
+          });
+      } else {
+        users = await knex("dim_users")
+          .select(["user_id", "username", "email"])
+          .where("username", "ilike", `%${ctx.query.query}%`);
+      }
 
       if (users.length > 0) {
         return runtime.json(200, users);
