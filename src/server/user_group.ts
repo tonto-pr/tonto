@@ -20,9 +20,24 @@ export const userGroupEndpoints: api.Endpoints = {
   },
   "/user_group/search": {
     get: async (ctx) => {
-      const userGroups: types.ShapeOfUserGroup[] = await knex("dim_user_groups")
-        .select("*")
-        .where("user_group_name", "ilike", `%${ctx.query.query}%`);
+      let userGroups: types.ShapeOfUserGroup[];
+      if (ctx.query.user_id) {
+        userGroups = await knex("fact_user_group_users")
+          .select("dim_user_groups.*")
+          .leftJoin(
+            "dim_user_groups",
+            "fact_user_group_users.user_group_id",
+            "dim_user_groups.user_group_id"
+          )
+          .where("user_group_name", "ilike", `%${ctx.query.query}%`)
+          .andWhere({
+            user_id: ctx.query.user_id,
+          });
+      } else {
+        userGroups = await knex("dim_user_groups")
+          .select("*")
+          .where("user_group_name", "ilike", `%${ctx.query.query}%`);
+      }
 
       if (userGroups.length > 0) {
         return runtime.json(200, userGroups);

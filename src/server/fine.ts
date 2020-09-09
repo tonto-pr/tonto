@@ -22,7 +22,7 @@ export const fineEndpoints: api.Endpoints = {
     get: async (ctx) => {
       let fines: types.ShapeOfFine[];
 
-      if (ctx.query.usergroup_id) {
+      if (ctx.query.user_group_id) {
         fines = await knex("fact_user_group_fines")
           .select("dim_fines.*")
           .leftJoin(
@@ -32,7 +32,7 @@ export const fineEndpoints: api.Endpoints = {
           )
           .where("description", "ilike", `%${ctx.query.query}%`)
           .andWhere({
-            usergroup_id: ctx.query.usergroup_id,
+            user_group_id: ctx.query.user_group_id,
           });
       } else {
         fines = await knex("dim_fines")
