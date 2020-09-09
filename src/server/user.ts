@@ -43,7 +43,7 @@ export const userEndpoints: api.Endpoints = {
   "/user/search": {
     get: async (ctx) => {
       let users: types.ShapeOfUser[];
-      if (ctx.query.usergroup_id) {
+      if (ctx.query.user_group_id) {
         users = await knex("fact_user_group_users")
           .select(["dim_users.user_id", "username", "email"])
           .leftJoin(
@@ -51,9 +51,9 @@ export const userEndpoints: api.Endpoints = {
             "fact_user_group_users.user_id",
             "dim_users.user_id"
           )
-          .where("description", "ilike", `%${ctx.query.query}%`)
+          .where("username", "ilike", `%${ctx.query.query}%`)
           .andWhere({
-            usergroup_id: ctx.query.usergroup_id,
+            user_group_id: ctx.query.user_group_id,
           });
       } else {
         users = await knex("dim_users")
@@ -113,7 +113,6 @@ export const userEndpoints: api.Endpoints = {
       )
         .select("user_group_id")
         .where({ user_id: ctx.params.user_id });
-
       const givenFines: types.ShapeOfGivenFineWithProps[] = (
         await Promise.all(
           userGroupUsers.map(async (userGroupUser) => {
