@@ -20,24 +20,42 @@ export const fineEndpoints: api.Endpoints = {
   },
   "/fine/search": {
     get: async (ctx) => {
-      let fines: types.ShapeOfFine[];
+      let fines: types.ShapeOfFineWithUserGroup[];
 
       if (ctx.query.user_group_id) {
-        fines = await knex("fact_user_group_fines")
-          .select("dim_fines.*")
-          .leftJoin(
-            "dim_fines",
-            "fact_user_group_fines.fine_id",
-            "dim_fines.fine_id"
-          )
-          .where("description", "ilike", `%${ctx.query.query}%`)
-          .andWhere({
-            user_group_id: ctx.query.user_group_id,
-          });
+        fines = (
+          await knex.raw(`
+          SELECT dim_fines.*, row_to_json(dim_user_groups) as user_group
+          FROM fact_user_group_fines
+          LEFT JOIN dim_fines
+          ON dim_fines.fine_id = fact_user_group_fines.fine_id
+          LEFT JOIN dim_user_groups
+          ON dim_user_groups.user_group_id = fact_user_group_fines.user_group_id
+          WHERE description ILIKE '%${ctx.query.query}%'
+          AND fact_user_group_fines.user_group_id = ${ctx.query.user_group_id}
+        `)
+        ).rows;
+      } else if (ctx.query.user_id) {
+        fines = (
+          await knex.raw(`
+          SELECT dim_fines.*, row_to_json(dim_user_groups) as user_group
+          FROM fact_user_group_users
+          LEFT JOIN fact_user_group_fines
+          ON fact_user_group_fines.user_group_id = fact_user_group_users.user_group_id
+          LEFT JOIN dim_fines
+          ON dim_fines.fine_id = fact_user_group_fines.fine_id
+          LEFT JOIN dim_user_groups
+          ON dim_user_groups.user_group_id = fact_user_group_fines.user_group_id
+          WHERE description ILIKE '%${ctx.query.query}%'
+          AND fact_user_group_users.user_id = ${ctx.query.user_id}
+          `)
+        ).rows;
       } else {
-        fines = await knex("dim_fines")
-          .select("*")
-          .where("description", "ilike", `%${ctx.query.query}%`);
+        return runtime.json(500, {
+          message:
+            "you must provide either user_group_id or user_id as a query parameter",
+          status: 500,
+        });
       }
 
       if (fines.length > 0) {

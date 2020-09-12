@@ -50,6 +50,10 @@ paths:
           name: user_group_id
           schema:
             type: string
+        - in: query
+          name: user_id
+          schema:
+            type: string
       responses:
         200:
           content:
@@ -57,7 +61,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Fine"
+                  $ref: "#/components/schemas/FineWithUserGroup"
         404:
           $ref: "#/components/responses/NotFound"
         500:
@@ -721,6 +725,15 @@ components:
       required:
         - amount
         - description
+    FineWithUserGroup:
+      allOf:
+        - $ref: "#/components/schemas/Fine"
+        - type: object
+          properties:
+            user_group:
+              $ref: "#/components/schemas/UserGroup"
+          required:
+            - user_group
     User:
       type: object
       properties:
