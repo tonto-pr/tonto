@@ -639,6 +639,9 @@ components:
           type: integer
         fine_id:
           type: integer
+        created_at:
+          type: string
+          format: datetime
       required:
         - receiver_user_id
         - giver_user_id
@@ -657,6 +660,9 @@ components:
           $ref: "#/components/schemas/UserGroup"
         fine:
           $ref: "#/components/schemas/Fine"
+        created_at:
+          type: string
+          format: datetime
       required:
         - given_fine_id
         - receiver_user

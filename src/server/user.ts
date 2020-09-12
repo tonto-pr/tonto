@@ -122,7 +122,8 @@ export const userEndpoints: api.Endpoints = {
                 row_to_json(dim_users_giver) as giver_user,
                 row_to_json(dim_user_groups) as user_group,
                 row_to_json(dim_fines) as fine,
-                given_fine_id
+                given_fine_id,
+                created_at
               FROM fact_given_fines
               LEFT JOIN (SELECT user_id, username, email FROM dim_users) dim_users_receiver
               ON dim_users_receiver.user_id = fact_given_fines.receiver_user_id
