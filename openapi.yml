@@ -640,8 +640,7 @@ components:
         fine_id:
           type: integer
         created_at:
-          type: string
-          format: datetime
+          type: integer
       required:
         - receiver_user_id
         - giver_user_id
@@ -661,8 +660,7 @@ components:
         fine:
           $ref: "#/components/schemas/Fine"
         created_at:
-          type: string
-          format: datetime
+          type: integer
       required:
         - given_fine_id
         - receiver_user
