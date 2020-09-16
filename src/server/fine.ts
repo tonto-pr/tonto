@@ -66,12 +66,36 @@ export const fineEndpoints: api.Endpoints = {
   },
   "/fine/give": {
     post: async (ctx) => {
-      const givenFine: types.ShapeOfGivenFine[] = await knex("fact_given_fines")
+      const givenFines: types.ShapeOfGivenFine[] = await knex(
+        "fact_given_fines"
+      )
         .returning("*")
         .insert(ctx.body.value as types.ShapeOfGivenFine);
 
-      if (givenFine) {
-        return runtime.json(200, givenFine[0]);
+      const givenFinesWithProps: types.ShapeOfGivenFineWithProps[] = (
+        await knex.raw(`
+        SELECT
+          row_to_json(dim_users_receiver) as receiver_user,
+          row_to_json(dim_users_giver) as giver_user,
+          row_to_json(dim_user_groups) as user_group,
+          row_to_json(dim_fines) as fine,
+          given_fine_id,
+          extract(epoch from created_at at time zone 'utc')::integer created_at
+        FROM fact_given_fines
+        LEFT JOIN (SELECT user_id, username, email FROM dim_users) dim_users_receiver
+        ON dim_users_receiver.user_id = fact_given_fines.receiver_user_id
+        LEFT JOIN (SELECT user_id, username, email FROM dim_users) dim_users_giver
+        ON dim_users_giver.user_id = fact_given_fines.giver_user_id
+        LEFT JOIN dim_user_groups
+        ON dim_user_groups.user_group_id = fact_given_fines.user_group_id
+        LEFT JOIN dim_fines
+        ON dim_fines.fine_id = fact_given_fines.fine_id
+        WHERE given_fine_id = ${givenFines[0].given_fine_id}
+      `)
+      ).rows;
+
+      if (givenFinesWithProps.length > 0) {
+        return runtime.json(200, givenFinesWithProps[0]);
       }
 
       return runtime.json(404, { message: "not found", status: 404 });

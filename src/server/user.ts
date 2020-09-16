@@ -133,7 +133,9 @@ export const userEndpoints: api.Endpoints = {
               ON dim_user_groups.user_group_id = fact_given_fines.user_group_id
               LEFT JOIN dim_fines
               ON dim_fines.fine_id = fact_given_fines.fine_id
-              WHERE fact_given_fines.user_group_id = ${userGroupUser.user_group_id};
+              WHERE extract(epoch from created_at at time zone 'utc')::integer > ${ctx.query.fromUnixTime}
+              AND extract(epoch from created_at at time zone 'utc')::integer < ${ctx.query.toUnixTime}
+              AND fact_given_fines.user_group_id = ${userGroupUser.user_group_id};
             `);
             return rows as types.ShapeOfGivenFineWithProps;
           })

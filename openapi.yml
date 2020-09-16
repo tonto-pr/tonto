@@ -88,7 +88,7 @@ paths:
               schema:
                 title: Fine created
                 type: object
-                $ref: "#/components/schemas/GivenFine"
+                $ref: "#/components/schemas/GivenFineWithProps"
         404:
           $ref: "#/components/responses/NotFound"
         500:
@@ -315,6 +315,16 @@ paths:
           schema:
             type: string
             minimum: 1
+        - in: query
+          name: fromUnixTime
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: toUnixTime
+          required: true
+          schema:
+            type: string
       responses:
         200:
           content:
