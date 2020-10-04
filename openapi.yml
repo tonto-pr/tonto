@@ -622,6 +622,24 @@ paths:
           $ref: "#/components/responses/NotFound"
         500:
           $ref: "#/components/responses/BadRequest"
+  /beta/activate:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BetaKey"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BetaKey"
+        404:
+          $ref: "#/components/responses/NotFound"
+        500:
+          $ref: "#/components/responses/BadRequest"
   /test:
     get:
       tags:
@@ -773,6 +791,17 @@ components:
           type: string
       required:
         - user_group_name
+    BetaKey:
+      type: object
+      properties:
+        beta_key_id:
+          type: integer
+        beta_key:
+          type: string
+        activated:
+          type: boolean
+      required:
+        - beta_key
     Error:
       type: object
       properties:
