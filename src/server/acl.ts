@@ -44,4 +44,29 @@ export const aclEndpoints: api.Endpoints = {
       return runtime.json(404, { message: "not found", status: 404 });
     },
   },
+  "/beta/activate": {
+    post: async (ctx) => {
+      const keys: types.ShapeOfBetaKey[] = await knex("dim_beta_keys")
+        .select("*")
+        .where({ beta_key: ctx.body.value.beta_key, activated: false });
+
+      if (keys.length === 0) {
+        return runtime.json(404, {
+          message: "key already activated",
+          status: 404,
+        });
+      }
+
+      const updatedKeys: types.ShapeOfBetaKey[] = await knex("dim_beta_keys")
+        .where({ beta_key: ctx.body.value.beta_key })
+        .returning("*")
+        .update({ activated: true });
+
+      if (updatedKeys.length > 0) {
+        return runtime.json(200, updatedKeys[0]);
+      }
+
+      return runtime.json(404, { message: "not found", status: 404 });
+    },
+  },
 };
