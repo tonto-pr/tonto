@@ -35,7 +35,7 @@
     "@types/koa-router": "^7.0.23",
     "@types/koa__cors": "^3.0.1",
     "assert": "^2.0.0",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "crypto-random-string": "^3.2.0",
     "jest": "^25.1.0",
